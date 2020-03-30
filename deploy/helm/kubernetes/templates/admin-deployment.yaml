@@ -1,0 +1,41 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ $fullName }}-admin"
+  labels:
+    app: "{{ $fullName }}-admin"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ $fullName }}-admin"
+  template:
+    metadata:
+      labels:
+        app: "{{ $fullName }}-admin"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - command: [ 'sleep', 'infinity' ]
+        image: docker.io/kvaps/kubernetes-tools:v0.0.1
+        imagePullPolicy: IfNotPresent
+        name: admin
+        resources:
+          requests:
+            cpu: 100m
+        env:
+        - name: KUBECONFIG
+          var: 
+          value: "/etc/kubernetes/admin.conf"
+        - name: FULL_NAME
+          value: "{{ $fullName }}"
+        volumeMounts:
+        - mountPath: /etc/kubernetes/
+          name: kubeconfig
+          readOnly: true
+      volumes:
+      - secret:
+          secretName: "{{ $fullName }}-admin-conf"
+        name: kubeconfig

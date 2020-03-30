@@ -1,0 +1,112 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-apiserver
+  labels:
+    app: {{ $fullName }}-apiserver
+spec:
+  type: NodePort
+  publishNotReadyAddresses: true
+  ports:
+  - port: 6443
+    name: client
+  selector:
+    app: {{ $fullName }}-apiserver
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ $fullName }}-apiserver"
+  labels:
+    app: "{{ $fullName }}-apiserver"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ $fullName }}-apiserver"
+  template:
+    metadata:
+      labels:
+        app: "{{ $fullName }}-apiserver"
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - command:
+        - kube-apiserver
+        - --allow-privileged=true
+        - --authorization-mode=Node,RBAC
+        - --client-ca-file=/pki/apiserver/ca.crt
+        - --enable-admission-plugins=NodeRestriction
+        - --enable-bootstrap-token-auth=true
+        - --etcd-cafile=/pki/apiserver-etcd-client/ca.crt
+        - --etcd-certfile=/pki/apiserver-etcd-client/tls.crt
+        - --etcd-keyfile=/pki/apiserver-etcd-client/tls.key
+        - "--etcd-servers=https://{{ $fullName }}-etcd-0.{{ $fullName }}-etcd:2379,https://{{ $fullName }}-etcd-1.{{ $fullName }}-etcd:2379,https://{{ $fullName }}-etcd-2.{{ $fullName }}-etcd:2379" # TODO
+        - --insecure-port=0
+        - --kubelet-client-certificate=/pki/apiserver-kubelet-client/tls.crt
+        - --kubelet-client-key=/pki/apiserver-kubelet-client/tls.key
+        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+        - --proxy-client-cert-file=/pki/front-proxy-client/tls.crt
+        - --proxy-client-key-file=/pki/front-proxy-client/tls.key
+        - --requestheader-allowed-names=front-proxy-client
+        - --requestheader-client-ca-file=/pki/front-proxy-client/ca.crt
+        - --requestheader-extra-headers-prefix=X-Remote-Extra-
+        - --requestheader-group-headers=X-Remote-Group
+        - --requestheader-username-headers=X-Remote-User
+        - --secure-port=6443
+        - --service-account-key-file=/pki/sa/sa.pub
+        - --service-cluster-ip-range=10.96.0.0/12
+        - --tls-cert-file=/pki/apiserver/tls.crt
+        - --tls-private-key-file=/pki/apiserver/tls.key
+        image: k8s.gcr.io/kube-apiserver:v1.18.0
+        ports:
+        - containerPort: 6443
+          name: client
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            host: 127.0.0.1
+            host: 127.0.0.1
+            path: /healthz
+            port: 6443
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          timeoutSeconds: 15
+        name: kube-apiserver
+        resources:
+          requests:
+            cpu: 250m
+        volumeMounts:
+        - mountPath: /pki/front-proxy-client
+          name: pki-front-proxy-client
+        - mountPath: /pki/apiserver
+          name: pki-apiserver
+        - mountPath: /pki/apiserver-etcd-client
+          name: pki-apiserver-etcd-client
+        - mountPath: /pki/apiserver-kubelet-client
+          name: pki-apiserver-kubelet-client
+        - mountPath: /pki/sa
+          name: pki-sa
+
+      volumes:
+      - secret:
+          secretName: "{{ $fullName }}-pki-front-proxy-client"
+        name: pki-front-proxy-client
+      - secret:
+          secretName: "{{ $fullName }}-pki-apiserver"
+        name: pki-apiserver
+      - secret:
+          secretName: "{{ $fullName }}-pki-apiserver-etcd-client"
+        name: pki-apiserver-etcd-client
+      - secret:
+          secretName: "{{ $fullName }}-pki-apiserver-kubelet-client"
+        name: pki-apiserver-kubelet-client
+      - secret:
+          secretName: "{{ $fullName }}-pki-ca"
+        name: pki-ca
+      - secret:
+          secretName: "{{ $fullName }}-pki-sa"
+        name: pki-sa

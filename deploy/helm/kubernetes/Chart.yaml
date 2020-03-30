@@ -1,0 +1,15 @@
+name: kubernetes
+description: Production-Grade Container Scheduling and Management
+version: v0.0.1
+keywords:
+  - kubernetes
+  - go
+  - cncf
+  - containers
+home: https://github.com/kvaps/kubernetes-in-kubernetes
+sources:
+  - https://github.com/kvaps/kubernetes-in-kubernetes
+  - https://github.com/kubernetes/kubernetes
+maintainers:
+  - name: kvaps
+    email: kvapss@gmail.com

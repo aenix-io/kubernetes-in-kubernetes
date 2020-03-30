@@ -1,0 +1,138 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-etcd-ca"
+spec:
+  commonName: "{{ $fullName }}-pki-etcd-ca"
+  secretName: "{{ $fullName }}-pki-etcd-ca"
+  duration: 87600h # 3650d
+  renewBefore: 8760h # 365d
+  organization:
+  - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "digital signature"
+  - "key encipherment"
+  - "cert sign"
+  isCA: true
+  issuerRef:
+    name: "{{ $fullName }}-selfsigning-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: "{{ $fullName }}-pki-etcd-ca"
+spec:
+  ca:
+    secretName: "{{ $fullName }}-pki-etcd-ca"
+---
+{{- $svcName1 := printf "%s-etcd" $fullName }}
+{{- $svcName2 := printf "%s-etcd.%s" $fullName .Release.Namespace }}
+{{- $svcName3 := printf "%s-etcd.%s.svc" $fullName .Release.Namespace }}
+{{- $podName1 := printf "*.%s-etcd" $fullName }}
+{{- $podName2 := printf "*.%s-etcd.%s" $fullName .Release.Namespace }}
+{{- $podName3 := printf "*.%s-etcd.%s.svc" $fullName .Release.Namespace }}
+{{- $svcClientName1 := printf "%s-etcd-client" $fullName }}
+{{- $svcClientName2 := printf "%s-etcd-client.%s" $fullName .Release.Namespace }}
+{{- $svcClientName3 := printf "%s-etcd-client.%s.svc" $fullName .Release.Namespace }}
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-etcd-peer"
+spec:
+  commonName: "{{ $fullName }}-pki-etcd-peer"
+  secretName: "{{ $fullName }}-pki-etcd-peer"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  organization:
+  - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "server auth"
+  - "client auth"
+  dnsNames:
+  - "{{ $svcName1 }}"
+  - "{{ $svcName2 }}"
+  - "{{ $svcName3 }}"
+  - "{{ $podName1 }}"
+  - "{{ $podName2 }}"
+  - "{{ $podName3 }}"
+  - "localhost"
+  - "127.0.0.1"
+  issuerRef:
+    name: "{{ $fullName }}-pki-etcd-ca"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-etcd-server"
+spec:
+  commonName: "{{ $fullName }}-pki-etcd-server"
+  secretName: "{{ $fullName }}-pki-etcd-server"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  organization:
+  - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "server auth"
+  - "client auth"
+  dnsNames:
+  - "{{ $svcName1 }}"
+  - "{{ $svcName2 }}"
+  - "{{ $svcName3 }}"
+  - "{{ $podName1 }}"
+  - "{{ $podName2 }}"
+  - "{{ $podName3 }}"
+  - "{{ $svcClientName1 }}"
+  - "{{ $svcClientName2 }}"
+  - "{{ $svcClientName3 }}"
+  - "localhost"
+  - "127.0.0.1"
+  issuerRef:
+    name: "{{ $fullName }}-pki-etcd-ca"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-etcd-healthcheck-client"
+spec:
+  commonName: "{{ $fullName }}-pki-etcd-healthcheck-client"
+  secretName: "{{ $fullName }}-pki-etcd-healthcheck-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  organization:
+  - "system:masters"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  issuerRef:
+    name: "{{ $fullName }}-pki-etcd-ca"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-apiserver-etcd-client"
+spec:
+  commonName: "{{ $fullName }}-pki-apiserver-etcd-client"
+  secretName: "{{ $fullName }}-pki-apiserver-etcd-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  organization:
+  - "system:masters"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  issuerRef:
+    name: "{{ $fullName }}-pki-etcd-ca"
+    kind: Issuer

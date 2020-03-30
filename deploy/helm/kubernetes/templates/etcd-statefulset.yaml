@@ -1,0 +1,108 @@
+{{- if not .Values.genCa }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-etcd
+  labels:
+    app: {{ $fullName }}-etcd
+spec:
+  publishNotReadyAddresses: true
+  clusterIP: None
+  ports:
+  - port: 2379
+    name: client
+  - port: 2380
+    name: peer
+  selector:
+    app: {{ $fullName }}-etcd
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $fullName }}-etcd
+  labels:
+    app: {{ $fullName }}-etcd
+spec:
+  podManagementPolicy: Parallel
+  replicas: 3
+  serviceName: {{ $fullName }}-etcd
+  selector:
+    matchLabels:
+      app: {{ $fullName }}-etcd
+  template:
+    metadata:
+      name: {{ $fullName }}-etcd
+      labels:
+        app: {{ $fullName }}-etcd
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - command:
+        - etcd
+        - --advertise-client-urls=https://$(POD_NAME).{{ $fullName }}-etcd:2379
+        - --cert-file=/pki/etcd/server/tls.crt
+        - --client-cert-auth=true
+        - --data-dir=/var/lib/etcd
+        - --initial-advertise-peer-urls=https://$(POD_NAME).{{ $fullName }}-etcd:2380
+        - --initial-cluster={{ $fullName }}-etcd-0=https://{{ $fullName }}-etcd-0.{{ $fullName }}-etcd:2380,{{ $fullName }}-etcd-1=https://{{ $fullName }}-etcd-1.{{ $fullName }}-etcd:2380,{{ $fullName }}-etcd-2=https://{{ $fullName }}-etcd-2.{{ $fullName }}-etcd:2380
+        - --initial-cluster-state=new
+        #- --initial-cluster-state=existing
+        - --initial-cluster-token={{ $fullName }}-etcd
+        - --key-file=/pki/etcd/server/tls.key
+        - --listen-client-urls=https://0.0.0.0:2379
+        - --listen-metrics-urls=http://0.0.0.0:2381
+        - --listen-peer-urls=https://0.0.0.0:2380
+        - --name=$(POD_NAME)
+        - --peer-cert-file=/pki/etcd/peer/tls.crt
+        - --peer-client-cert-auth=true
+        - --peer-key-file=/pki/etcd/peer/tls.key
+        - --peer-trusted-ca-file=/pki/etcd/ca/tls.crt
+        - --snapshot-count=10000
+        - --trusted-ca-file=/pki/etcd/ca/tls.crt
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: k8s.gcr.io/etcd:3.4.3-0
+        ports:
+        - containerPort: 2379
+          name: client
+        - containerPort: 2380
+          name: peer
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            host: 127.0.0.1
+            path: /health
+            port: 2381
+            scheme: HTTP
+          initialDelaySeconds: 15
+          timeoutSeconds: 15
+        name: etcd
+        resources: {}
+        volumeMounts:
+        - mountPath: /pki/etcd/ca
+          name: pki-etcd-certs-ca
+        - mountPath: /pki/etcd/peer
+          name: pki-etcd-certs-peer
+        - mountPath: /pki/etcd/server
+          name: pki-etcd-certs-server
+        - mountPath: /var/lib/etcd
+          name: etcd-data
+      volumes:
+      - secret:
+          secretName: {{ $fullName }}-pki-etcd-ca
+        name: pki-etcd-certs-ca
+      - secret:
+          secretName: {{ $fullName }}-pki-etcd-peer
+        name: pki-etcd-certs-peer
+      - secret:
+          secretName: {{ $fullName }}-pki-etcd-server
+        name: pki-etcd-certs-server
+      - emptyDir: {}
+        name: etcd-data
+{{- end }}

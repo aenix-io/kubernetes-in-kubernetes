@@ -1,0 +1,83 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-ca"
+spec:
+  commonName: "{{ $fullName }}-pki-ca"
+  secretName: "{{ $fullName }}-pki-ca"
+  duration: 87600h # 3650d
+  renewBefore: 8760h # 365d
+  organization:
+  - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "digital signature"
+  - "key encipherment"
+  - "cert sign"
+  isCA: true
+  issuerRef:
+    name: "{{ $fullName }}-selfsigning-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: "{{ $fullName }}-pki-ca"
+spec:
+  ca:
+    secretName: "{{ $fullName }}-pki-ca"
+---
+{{- $svcName1 := printf "%s-apiserver" $fullName }}
+{{- $svcName2 := printf "%s-apiserver.%s" $fullName .Release.Namespace }}
+{{- $svcName3 := printf "%s-apiserver.%s.svc" $fullName .Release.Namespace }}
+{{- $podName1 := printf "*.%s-apiserver" $fullName }}
+{{- $podName2 := printf "*.%s-apiserver.%s" $fullName .Release.Namespace }}
+{{- $podName3 := printf "*.%s-apiserver.%s.svc" $fullName .Release.Namespace }}
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-apiserver"
+spec:
+  commonName: "{{ $fullName }}-pki-apiserver"
+  secretName: "{{ $fullName }}-pki-apiserver"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  organization:
+  - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "server auth"
+  dnsNames:
+  - "{{ $svcName1 }}"
+  - "{{ $svcName2 }}"
+  - "{{ $svcName3 }}"
+  - "{{ $podName1 }}"
+  - "{{ $podName2 }}"
+  - "{{ $podName3 }}"
+  - "localhost"
+  - "127.0.0.1"
+  issuerRef:
+    name: "{{ $fullName }}-pki-ca"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-apiserver-kubelet-client"
+spec:
+  commonName: "{{ $fullName }}-pki-apiserver-kubelet-client"
+  secretName: "{{ $fullName }}-pki-apiserver-kubelet-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  organization:
+  - "system:masters"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  issuerRef:
+    name: "{{ $fullName }}-pki-ca"
+    kind: Issuer

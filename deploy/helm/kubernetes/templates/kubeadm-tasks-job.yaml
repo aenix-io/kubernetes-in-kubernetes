@@ -1,0 +1,92 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch", "create", "delete", "update", "patch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+subjects:
+- kind: ServiceAccount
+  name: "{{ $fullName }}-kubeadm-tasks"
+  namespace: "{{ .Release.Namespace }}"
+roleRef:
+  kind: Role
+  name: "{{ $fullName }}-kubeadm-tasks"
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+  labels:
+    app: "{{ $fullName }}-kubeadm-tasks"
+spec:
+  template:
+    metadata:
+      labels:
+        app: "{{ $fullName }}-kubeadm-tasks"
+      #annotations:
+      #  checksum/config: {{ include (print $.Template.BasePath "/kubeadm-tasks-configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: "{{ $fullName }}-kubeadm-tasks"
+      restartPolicy: OnFailure
+      containers:
+      - name: kubeadm
+        image: docker.io/kvaps/kubernetes-tools:v0.0.1
+        imagePullPolicy: Always
+        command: [ '/scripts/kubeadm-tasks.sh' ]
+        env:
+        - name: FULL_NAME
+          value: "{{ $fullName }}"
+        volumeMounts:
+        - mountPath: /pki/front-proxy-client
+          name: pki-front-proxy-client
+        - mountPath: /pki/apiserver
+          name: pki-apiserver
+        - mountPath: /pki/apiserver-etcd-client
+          name: pki-apiserver-etcd-client
+        - mountPath: /pki/apiserver-kubelet-client
+          name: pki-apiserver-kubelet-client
+        - mountPath: /pki/ca
+          name: pki-ca
+        - mountPath: /pki/front-proxy-ca
+          name: pki-front-proxy-ca
+        - mountPath: /scripts
+          name: scripts
+
+      volumes:
+      - secret:
+          secretName: "{{ $fullName }}-pki-front-proxy-client"
+        name: pki-front-proxy-client
+      - secret:
+          secretName: "{{ $fullName }}-pki-apiserver"
+        name: pki-apiserver
+      - secret:
+          secretName: "{{ $fullName }}-pki-apiserver-etcd-client"
+        name: pki-apiserver-etcd-client
+      - secret:
+          secretName: "{{ $fullName }}-pki-apiserver-kubelet-client"
+        name: pki-apiserver-kubelet-client
+      - secret:
+          secretName: "{{ $fullName }}-pki-ca"
+        name: pki-ca
+      - secret:
+          secretName: "{{ $fullName }}-pki-front-proxy-ca"
+        name: pki-front-proxy-ca
+      - name: scripts
+        configMap:
+          name: "{{ $fullName }}-kubeadm-tasks"
+          defaultMode: 0777

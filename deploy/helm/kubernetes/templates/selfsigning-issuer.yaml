@@ -1,0 +1,8 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: "{{ $fullName }}-selfsigning-issuer"
+spec:
+  selfSigned: {}
