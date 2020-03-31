@@ -24,7 +24,7 @@ spec:
 apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
-  name: "{{ $fullName }}-pki-etcd-ca"
+  name: "{{ $fullName }}-etcd-issuer"
 spec:
   ca:
     secretName: "{{ $fullName }}-pki-etcd-ca"
@@ -64,7 +64,7 @@ spec:
   - "localhost"
   - "127.0.0.1"
   issuerRef:
-    name: "{{ $fullName }}-pki-etcd-ca"
+    name: "{{ $fullName }}-etcd-issuer"
     kind: Issuer
 ---
 apiVersion: cert-manager.io/v1alpha2
@@ -96,7 +96,7 @@ spec:
   - "localhost"
   - "127.0.0.1"
   issuerRef:
-    name: "{{ $fullName }}-pki-etcd-ca"
+    name: "{{ $fullName }}-etcd-issuer"
     kind: Issuer
 ---
 apiVersion: cert-manager.io/v1alpha2
@@ -115,7 +115,7 @@ spec:
   - "key encipherment"
   - "client auth"
   issuerRef:
-    name: "{{ $fullName }}-pki-etcd-ca"
+    name: "{{ $fullName }}-etcd-issuer"
     kind: Issuer
 ---
 apiVersion: cert-manager.io/v1alpha2
@@ -134,5 +134,5 @@ spec:
   - "key encipherment"
   - "client auth"
   issuerRef:
-    name: "{{ $fullName }}-pki-etcd-ca"
+    name: "{{ $fullName }}-etcd-issuer"
     kind: Issuer

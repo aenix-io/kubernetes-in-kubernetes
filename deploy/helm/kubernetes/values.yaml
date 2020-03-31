@@ -1,0 +1,5 @@
+controlPlaneEndpoint:
+apiServer:
+  certSANs:
+    dnsNames: []
+    ipAddresses: []

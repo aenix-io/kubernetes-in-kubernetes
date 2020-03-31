@@ -1,20 +1,5 @@
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ $fullName }}-apiserver
-  labels:
-    app: {{ $fullName }}-apiserver
-spec:
-  type: NodePort
-  publishNotReadyAddresses: true
-  ports:
-  - port: 6443
-    name: client
-  selector:
-    app: {{ $fullName }}-apiserver
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

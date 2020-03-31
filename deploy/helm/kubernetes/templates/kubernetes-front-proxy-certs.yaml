@@ -24,7 +24,7 @@ spec:
 apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
-  name: "{{ $fullName }}-pki-front-proxy-ca"
+  name: "{{ $fullName }}-front-proxy-issuer"
 spec:
   ca:
     secretName: "{{ $fullName }}-pki-front-proxy-ca"
@@ -45,5 +45,5 @@ spec:
   - "key encipherment"
   - "client auth"
   issuerRef:
-    name: "{{ $fullName }}-pki-front-proxy-ca"
+    name: "{{ $fullName }}-front-proxy-issuer"
     kind: Issuer

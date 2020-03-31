@@ -24,7 +24,7 @@ spec:
 apiVersion: cert-manager.io/v1alpha2
 kind: Issuer
 metadata:
-  name: "{{ $fullName }}-pki-ca"
+  name: "{{ $fullName }}-issuer"
 spec:
   ca:
     secretName: "{{ $fullName }}-pki-ca"
@@ -58,9 +58,16 @@ spec:
   - "{{ $podName2 }}"
   - "{{ $podName3 }}"
   - "localhost"
+  {{- with .Values.apiServer.certSANs.dnsNames }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
+  ipAddresses:
   - "127.0.0.1"
+  {{- with .Values.apiServer.certSANs.ipAddresses }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
   issuerRef:
-    name: "{{ $fullName }}-pki-ca"
+    name: "{{ $fullName }}-issuer"
     kind: Issuer
 ---
 apiVersion: cert-manager.io/v1alpha2
@@ -79,5 +86,5 @@ spec:
   - "key encipherment"
   - "client auth"
   issuerRef:
-    name: "{{ $fullName }}-pki-ca"
+    name: "{{ $fullName }}-issuer"
     kind: Issuer

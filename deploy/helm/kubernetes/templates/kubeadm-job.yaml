@@ -39,7 +39,8 @@ spec:
       labels:
         app: "{{ $fullName }}-kubeadm-tasks"
       #annotations:
-      #  checksum/config: {{ include (print $.Template.BasePath "/kubeadm-tasks-configmap.yaml") . | sha256sum }}
+      #  checksum/config: {{ include (print $.Template.BasePath "/kubeadm-config.yaml") . | sha256sum }}
+      #  checksum/scripts: {{ include (print $.Template.BasePath "/kubeadm-scripts.yaml") . | sha256sum }}
     spec:
       serviceAccountName: "{{ $fullName }}-kubeadm-tasks"
       restartPolicy: OnFailure
@@ -47,10 +48,14 @@ spec:
       - name: kubeadm
         image: docker.io/kvaps/kubernetes-tools:v0.0.1
         imagePullPolicy: Always
-        command: [ '/scripts/kubeadm-tasks.sh' ]
+        command: [ '/scripts/configure-cluster.sh' ]
         env:
         - name: FULL_NAME
           value: "{{ $fullName }}"
+        {{- with .Values.controlPlaneEndpoint }}
+        - name: CONTROL_PLANE_ENDPOINT
+          value: "{{ . }}"
+        {{- end }}
         volumeMounts:
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client
@@ -66,6 +71,8 @@ spec:
           name: pki-front-proxy-ca
         - mountPath: /scripts
           name: scripts
+        - mountPath: /config
+          name: config
 
       volumes:
       - secret:
@@ -88,5 +95,8 @@ spec:
         name: pki-front-proxy-ca
       - name: scripts
         configMap:
-          name: "{{ $fullName }}-kubeadm-tasks"
+          name: "{{ $fullName }}-kubeadm-scripts"
           defaultMode: 0777
+      - name: config
+        configMap:
+          name: "{{ $fullName }}-kubeadm-config"
