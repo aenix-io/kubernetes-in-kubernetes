@@ -16,6 +16,10 @@ spec:
       labels:
         app: "{{ $fullName }}-scheduller"
     spec:
+      {{- if .Values.scheduller.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.scheduller.image.PullSecrets | nindent 10 }}
+      {{- end }}
       automountServiceAccountToken: false
       containers:
       - command:
@@ -25,8 +29,8 @@ spec:
         - --bind-address=0.0.0.0
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
-        image: {{ .Values.scheduller.image }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        image: {{ .Values.scheduller.image.repository }}:{{ .Values.scheduller.image.tag }}
+        imagePullPolicy: {{ .Values.scheduller.imagePullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:

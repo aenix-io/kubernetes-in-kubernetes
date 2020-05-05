@@ -31,7 +31,11 @@ etcd:
     #   memory: 128Mi
 
 scheduller:
-  image: k8s.gcr.io/kube-scheduler:v1.18.0
+  image:
+    repository: k8s.gcr.io/kube-scheduler
+    tag: v1.18.0
+    PullPolicy: IfNotPresent
+    PullSecrets: []
   replicas: 1
   resources:
     requests:
