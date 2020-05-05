@@ -102,10 +102,10 @@ spec:
       - secret:
           secretName: {{ $fullName }}-pki-etcd-server
         name: pki-etcd-certs-server
-        {{- if not .Values.etcd.persistence.enabled }}
+      {{- if not .Values.etcd.persistence.enabled }}
       - emptyDir: {}
         name: etcd-data
-        {{- end }}
+      {{- end }}
   {{- if and .Values.etcd.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
