@@ -6,25 +6,38 @@ Deploy Kubernetes in Kubernetes using Helm
 
 ## Requirements
 
-* Kubernetes v1.16+
+* Kubernetes v1.15+
 * Helm v3
 * cert-manager v0.14+
+* any default PVC provisioner with 3gb free storage
 
 ## Usage
 
-1. [Install cert-manager](https://cert-manager.io/docs/installation/kubernetes/).
+### install provisioner
 
-2. Clone this replo.
+If you running over [minikube](https://github.com/kubernetes/minikube) you also need to use provisioner. For example:
 
-3. Create `kubernetes` namespace
+### [local-path-provisioner](https://github.com/rancher/local-path-provisioner)
 
-   ```
-   kubectl create ns kubernetes
-   ```
+```bash
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+```
 
-4. Deploy Kubernetes-in-Kubernetes:
+### install kubernetes-in-kubernetes
 
-   ```
-   cd deploy/helm
-   helm upgrade --install -n kubernetes foo kubernetes --wait
-   ```
+```bash
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.14.3/cert-manager.yaml
+kubectl create ns kubernetes
+git clone https://github.com/kvaps/kubernetes-in-kubernetes
+helm upgrade --install -n kubernetes foo kubernetes-in-kubernetes/deploy/helm/kubernetes
+kubectl exec -n kubernetes -ti `kubectl get pod -n kubernetes -l app=foo-kubernetes-admin -o name` -- sh
+```
+
+## Cleanup
+
+```bash
+helm -n kubernetes delete foo
+kubectl delete ns kubernetes
+kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v0.14.3/cert-manager.yaml
+```
+
