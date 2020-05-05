@@ -102,12 +102,35 @@ spec:
       - secret:
           secretName: {{ $fullName }}-pki-etcd-server
         name: pki-etcd-certs-server
-  volumeClaimTemplates:
-    - metadata:
+        {{- if not .Values.persistence.enabled }}
+      - emptyDir: {}
         name: etcd-data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 1Gi
+        {{- end }}
+  {{- if and .Values.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: etcd-data
+      labels:
+        app: {{ $fullName }}-etcd
+        {{- if .Values.persistence.labels }}
+        {{- toYaml .Values.persistence.labels | nindent 4 }}
+        {{- end }}
+      {{- with .Values.persistence.annotations  }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.persistence.finalizers  }}
+      finalizers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      accessModes:
+        {{- range .Values.persistence.accessModes }}
+        - {{ . | quote }}
+        {{- end }}
+      storageClassName: {{ .Values.persistence.storageClassName }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+  {{- end }}
 {{- end }}

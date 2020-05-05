@@ -3,3 +3,14 @@ apiServer:
   certSANs:
     dnsNames: []
     ipAddresses: []
+
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  # storageClassName: default
+  annotations: {}
+  finalizers:
+    - kubernetes.io/pvc-protection
+
