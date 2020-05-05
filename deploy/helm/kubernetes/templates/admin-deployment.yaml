@@ -27,6 +27,16 @@ spec:
         image: {{ .Values.admin.image.repository }}:{{ .Values.admin.image.tag }}
         imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         name: admin
+        livenessProbe:
+          exec:
+            command:
+            - kubectl
+            - auth
+            - can-i
+            - '*'
+            - '*'
+          initialDelaySeconds: 15
+          periodSeconds: 5
         resources:
           {{- toYaml .Values.admin.resources | nindent 10 }}
         env:
