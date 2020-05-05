@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-scheduller"
 spec:
-  replicas: 1
+  replicas: {{ $.Values.scheduller.replicas }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-scheduller"
@@ -26,7 +26,7 @@ spec:
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
         image: {{ $.Values.scheduller.image }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:

@@ -19,15 +19,23 @@ etcd:
     annotations: {}
     finalizers:
       - kubernetes.io/pvc-protection
-
-
-scheduller:
-  image: k8s.gcr.io/kube-scheduler:v1.18.0
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
-    limits:
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+
+scheduller:
+  image: k8s.gcr.io/kube-scheduler:v1.18.0
+  replicas: 1
+  resources:
+    requests:
       cpu: 100m
       memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
 
