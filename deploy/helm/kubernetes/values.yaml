@@ -10,8 +10,8 @@ etcd:
   image:
     repository: k8s.gcr.io/etcd
     tag: 3.4.3-0
-    imagePullPolicy: IfNotPresent
-    imagePullSecrets: []
+    PullPolicy: IfNotPresent
+    PullSecrets: []
   replicas: 3
   persistence:
     enabled: true
