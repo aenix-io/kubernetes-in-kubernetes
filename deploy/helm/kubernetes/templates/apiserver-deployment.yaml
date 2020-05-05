@@ -32,7 +32,8 @@ spec:
         - --etcd-cafile=/pki/apiserver-etcd-client/ca.crt
         - --etcd-certfile=/pki/apiserver-etcd-client/tls.crt
         - --etcd-keyfile=/pki/apiserver-etcd-client/tls.key
-        - --etcd-servers={{- range $k, $v := until (atoi (printf "%d" (int64 $.Values.etcd.replicas))) }}https://{{ $fullName }}-etcd-{{ $k }}.{{ $fullName }}-etcd:2379,{{ end }}
+{{- $replicas := int (toString (.Values.etcd.replicas)) }}
+        - --etcd-servers={{- range $k, $v := until (atoi (printf "%d" (int64 $.Values.etcd.replicas))) }}https://{{ $fullName }}-etcd-{{ $k }}.{{ $fullName }}-etcd:2379{{ $k := add $k 1 }}{{ if lt $k $replicas }},{{ end }}{{ end }}
         - --insecure-port=0
         - --kubelet-client-certificate=/pki/apiserver-kubelet-client/tls.crt
         - --kubelet-client-key=/pki/apiserver-kubelet-client/tls.key
