@@ -75,3 +75,18 @@ controllerManager:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+
+admin:
+  image:
+    repository: docker.io/kvaps/kubernetes-tools
+    tag: v0.0.1
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi

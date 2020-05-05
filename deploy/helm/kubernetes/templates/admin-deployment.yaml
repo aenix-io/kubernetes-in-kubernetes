@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-admin"
 spec:
-  replicas: 1
+  replicas: {{ .Values.admin.replicas }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-admin"
@@ -16,18 +16,20 @@ spec:
       labels:
         app: "{{ $fullName }}-admin"
     spec:
+      {{- with .Values.admin.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 10 }}
+      {{- end }}
       automountServiceAccountToken: false
       containers:
       - command: [ 'sleep', 'infinity' ]
-        image: docker.io/kvaps/kubernetes-tools:v0.0.1
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        image: {{ .Values.controllerManager.image.repository }}:{{ .Values.controllerManager.image.tag }}
+        imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         name: admin
         resources:
-          requests:
-            cpu: 100m
+          {{- toYaml .Values.admin.resources | nindent 10 }}
         env:
         - name: KUBECONFIG
-          var: 
           value: "/etc/kubernetes/admin.conf"
         - name: FULL_NAME
           value: "{{ $fullName }}"
