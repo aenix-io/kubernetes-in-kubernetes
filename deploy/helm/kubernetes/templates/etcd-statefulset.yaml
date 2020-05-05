@@ -25,7 +25,6 @@ metadata:
   labels:
     app: {{ $fullName }}-etcd
 spec:
-  podManagementPolicy: {{ .Values.etcd.podManagementPolicy }}
   replicas: {{ .Values.etcd.replicas }}
   serviceName: {{ $fullName }}-etcd
   selector:
@@ -37,6 +36,8 @@ spec:
       labels:
         app: {{ $fullName }}-etcd
     spec:
+      imagePullSecrets:
+        {{- toYaml .Values.etcd.image.imagePullSecrets | nindent 10 }}
       automountServiceAccountToken: false
       containers:
       - command:
@@ -65,13 +66,13 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: {{ .Values.etcd.image }}
+        image: {{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag }}
         ports:
         - containerPort: 2379
           name: client
         - containerPort: 2380
           name: peer
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.etcd.image.imagePullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
