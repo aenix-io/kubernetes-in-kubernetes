@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-apiserver"
 spec:
-  replicas: 1
+  replicas: {{ .Values.apiserver.replicas }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-apiserver"
@@ -16,6 +16,10 @@ spec:
       labels:
         app: "{{ $fullName }}-apiserver"
     spec:
+      {{- with .Values.apiserver.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 10 }}
+      {{- end }}
       automountServiceAccountToken: false
       containers:
       - command:
@@ -28,7 +32,7 @@ spec:
         - --etcd-cafile=/pki/apiserver-etcd-client/ca.crt
         - --etcd-certfile=/pki/apiserver-etcd-client/tls.crt
         - --etcd-keyfile=/pki/apiserver-etcd-client/tls.key
-        - "--etcd-servers=https://{{ $fullName }}-etcd-0.{{ $fullName }}-etcd:2379,https://{{ $fullName }}-etcd-1.{{ $fullName }}-etcd:2379,https://{{ $fullName }}-etcd-2.{{ $fullName }}-etcd:2379" # TODO
+        - --etcd-servers={{ template "kubernetes.etcdServers4ApiServer" . }}
         - --insecure-port=0
         - --kubelet-client-certificate=/pki/apiserver-kubelet-client/tls.crt
         - --kubelet-client-key=/pki/apiserver-kubelet-client/tls.key
@@ -42,19 +46,17 @@ spec:
         - --requestheader-username-headers=X-Remote-User
         - --secure-port=6443
         - --service-account-key-file=/pki/sa/sa.pub
-        - --service-cluster-ip-range=10.96.0.0/12
+        - --service-cluster-ip-range={{ .Values.apiserver.serviceClusterIPRange }}
         - --tls-cert-file=/pki/apiserver/tls.crt
         - --tls-private-key-file=/pki/apiserver/tls.key
-        image: k8s.gcr.io/kube-apiserver:v1.18.0
         ports:
         - containerPort: 6443
           name: client
-        imagePullPolicy: IfNotPresent
+        image: {{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag }}
+        imagePullPolicy: {{ .Values.apiserver.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
-            host: 127.0.0.1
-            host: 127.0.0.1
             path: /healthz
             port: 6443
             scheme: HTTPS
@@ -62,8 +64,7 @@ spec:
           timeoutSeconds: 15
         name: kube-apiserver
         resources:
-          requests:
-            cpu: 250m
+          {{- toYaml .Values.apiserver.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client
@@ -75,7 +76,6 @@ spec:
           name: pki-apiserver-kubelet-client
         - mountPath: /pki/sa
           name: pki-sa
-
       volumes:
       - secret:
           secretName: "{{ $fullName }}-pki-front-proxy-client"

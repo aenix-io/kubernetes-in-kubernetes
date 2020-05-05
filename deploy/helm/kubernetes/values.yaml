@@ -3,3 +3,90 @@ apiServer:
   certSANs:
     dnsNames: []
     ipAddresses: []
+
+imagePullPolicy: IfNotPresent
+
+etcd:
+  image:
+    repository: k8s.gcr.io/etcd
+    tag: 3.4.3-0
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicas: 3
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+    # storageClassName: default
+    annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+scheduller:
+  image:
+    repository: k8s.gcr.io/kube-scheduler
+    tag: v1.18.0
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+apiserver:
+  image:
+    repository: k8s.gcr.io/kube-apiserver
+    tag: v1.18.0
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  serviceClusterIPRange: 10.96.0.0/12
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+controllerManager:
+  image:
+    repository: k8s.gcr.io/kube-controller-manager
+    tag: v1.18.0
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+admin:
+  image:
+    repository: docker.io/kvaps/kubernetes-tools
+    tag: v0.0.1
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
