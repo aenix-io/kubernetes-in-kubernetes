@@ -24,8 +24,8 @@ Generate etcd servers list.
 */}}
 {{- define "kubernetes.etcdServers4ApiServer" -}}
   {{- $fullName := include "kubernetes.fullname" . -}}
-  {{- printf "https://" -}}
   {{- range $etcdcount, $e := until (.Values.etcd.replicas|int) -}}
+    {{- printf "https://" -}}
     {{- printf "%s-etcd-%d." $fullName $etcdcount -}}
     {{- printf "%s-etcd:%d" $fullName 2379 -}}
     {{- if lt $etcdcount  ( sub ($.Values.etcd.replicas|int) 1 ) -}}
@@ -46,4 +46,3 @@ Generate etcd servers list.
     {{- end -}}
   {{- end -}}
 {{- end -}}
-
