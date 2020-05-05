@@ -22,7 +22,7 @@ spec:
         - kube-scheduler
         - --authentication-kubeconfig=/etc/kubernetes/scheduler.conf
         - --authorization-kubeconfig=/etc/kubernetes/scheduler.conf
-        - --bind-address=127.0.0.1
+        - --bind-address=0.0.0.0
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
         image: {{ $.Values.scheduller.image }}
