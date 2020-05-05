@@ -76,7 +76,6 @@ spec:
         livenessProbe:
           failureThreshold: 8
           httpGet:
-            host: 127.0.0.1
             path: /health
             port: 2381
             scheme: HTTP
@@ -103,6 +102,12 @@ spec:
       - secret:
           secretName: {{ $fullName }}-pki-etcd-server
         name: pki-etcd-certs-server
-      - emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
         name: etcd-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
 {{- end }}
