@@ -49,8 +49,7 @@ spec:
         - --client-cert-auth=true
         - --data-dir=/var/lib/etcd
         - --initial-advertise-peer-urls=https://$(POD_NAME).{{ $fullName }}-etcd:2380
-{{- $replicas := int (toString (.Values.etcd.replicas)) }}
-        - --initial-cluster={{- range $k, $v := until (atoi (printf "%d" (int64 $.Values.etcd.replicas))) }}{{ $fullName }}-etcd-{{ $k }}=https://{{ $fullName }}-etcd-{{ $k }}.{{ $fullName }}-etcd:2380{{ $k := add $k 1 }}{{ if lt $k $replicas }},{{ end }}{{ end }}
+        - --initial-cluster={{ template "kubernetes.etcdServers4InitialCluster" . }}
         - --initial-cluster-state=new
         - --initial-cluster-token={{ $fullName }}-etcd
         - --key-file=/pki/etcd/server/tls.key
