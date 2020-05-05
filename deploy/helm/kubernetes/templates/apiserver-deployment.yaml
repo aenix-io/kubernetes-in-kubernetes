@@ -42,7 +42,7 @@ spec:
         - --requestheader-username-headers=X-Remote-User
         - --secure-port=6443
         - --service-account-key-file=/pki/sa/sa.pub
-        - --service-cluster-ip-range={{ .Values.apiserver.service_cluster_ip_range }}
+        - --service-cluster-ip-range={{ .Values.apiserver.serviceClusterIPRange }}
         - --tls-cert-file=/pki/apiserver/tls.crt
         - --tls-private-key-file=/pki/apiserver/tls.key
         image: {{ .Values.apiserver.image }}
@@ -60,7 +60,7 @@ spec:
           timeoutSeconds: 15
         name: kube-apiserver
         resources:
-{{ toYaml .Values.apiserver.resources | indent 10 }}
+          {{- toYaml .Values.apiserver.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client

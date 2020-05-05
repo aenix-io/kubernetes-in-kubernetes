@@ -82,7 +82,7 @@ spec:
           timeoutSeconds: 15
         name: etcd
         resources:
-{{ toYaml $.Values.etcd.resources | indent 10 }}
+          {{- toYaml $.Values.etcd.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /pki/etcd/ca
           name: pki-etcd-certs-ca

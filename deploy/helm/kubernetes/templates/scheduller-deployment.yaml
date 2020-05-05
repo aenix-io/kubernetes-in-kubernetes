@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-scheduller"
 spec:
-  replicas: {{ $.Values.scheduller.replicas }}
+  replicas: {{ .Values.scheduller.replicas }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-scheduller"
@@ -25,7 +25,7 @@ spec:
         - --bind-address=0.0.0.0
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
-        image: {{ $.Values.scheduller.image }}
+        image: {{ .Values.scheduller.image }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         livenessProbe:
           failureThreshold: 8
@@ -37,7 +37,7 @@ spec:
           timeoutSeconds: 15
         name: kube-scheduler
         resources:
-{{ toYaml $.Values.scheduller.resources | indent 10 }}
+          {{- toYaml .Values.scheduller.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /etc/kubernetes/
           name: kubeconfig

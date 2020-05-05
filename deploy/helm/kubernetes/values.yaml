@@ -8,7 +8,7 @@ imagePullPolicy: IfNotPresent
 
 etcd:
   image: k8s.gcr.io/etcd:3.4.3-0
-  podManagementPolicy: Parallel
+  podManagementPolicy: OrderedReady
   replicas: 3
   persistence:
     enabled: true
@@ -40,7 +40,7 @@ scheduller:
 
 apiserver:
   image: k8s.gcr.io/kube-apiserver:v1.18.0
-  service_cluster_ip_range: 10.96.0.0/12
+  serviceClusterIPRange: 10.96.0.0/12
   replicas: 1
   resources:
     requests:
@@ -50,7 +50,7 @@ apiserver:
     #   cpu: 100m
     #   memory: 128Mi
 
-controller_manager:
+controllerManager:
   image: k8s.gcr.io/kube-controller-manager:v1.18.0
   replicas: 1
   resources:

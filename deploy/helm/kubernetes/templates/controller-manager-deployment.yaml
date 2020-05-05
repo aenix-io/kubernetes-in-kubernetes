@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-controller-manager"
 spec:
-  replicas: {{ .Values.controller_manager.replicas }}
+  replicas: {{ .Values.controllerManager.replicas }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-controller-manager"
@@ -34,7 +34,7 @@ spec:
         - --root-ca-file=/pki/ca/tls.crt
         - --service-account-private-key-file=/pki/kubernetes-sa/sa.key
         - --use-service-account-credentials=true
-        image: {{ .Values.controller_manager.image }}
+        image: {{ .Values.controllerManager.image }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         livenessProbe:
           failureThreshold: 8
@@ -46,7 +46,7 @@ spec:
           timeoutSeconds: 15
         name: kube-controller-manager
         resources:
-{{ toYaml .Values.controller_manager.resources | indent 10 }}
+          {{- toYaml .Values.controllerManager.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /etc/kubernetes/
           name: kubeconfig
