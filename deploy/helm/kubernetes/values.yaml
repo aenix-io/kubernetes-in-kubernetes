@@ -46,7 +46,11 @@ scheduller:
     #   memory: 128Mi
 
 apiserver:
-  image: k8s.gcr.io/kube-apiserver:v1.18.0
+  image:
+    repository: k8s.gcr.io/kube-apiserver
+    tag: v1.18.0
+    PullPolicy: IfNotPresent
+    PullSecrets: []
   serviceClusterIPRange: 10.96.0.0/12
   replicas: 1
   resources:
