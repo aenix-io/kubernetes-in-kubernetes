@@ -47,7 +47,7 @@ spec:
       containers:
       - name: kubeadm
         image: docker.io/kvaps/kubernetes-tools:v0.0.1
-        imagePullPolicy: Always
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         command: [ '/scripts/configure-cluster.sh' ]
         env:
         - name: FULL_NAME
@@ -73,7 +73,6 @@ spec:
           name: scripts
         - mountPath: /config
           name: config
-
       volumes:
       - secret:
           secretName: "{{ $fullName }}-pki-front-proxy-client"

@@ -20,7 +20,7 @@ spec:
       containers:
       - command: [ 'sleep', 'infinity' ]
         image: docker.io/kvaps/kubernetes-tools:v0.0.1
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         name: admin
         resources:
           requests:
