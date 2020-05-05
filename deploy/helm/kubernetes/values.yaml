@@ -62,7 +62,11 @@ apiserver:
     #   memory: 128Mi
 
 controllerManager:
-  image: k8s.gcr.io/kube-controller-manager:v1.18.0
+  image:
+    repository: k8s.gcr.io/kube-controller-manager
+    tag: v1.18.0
+    PullPolicy: IfNotPresent
+    PullSecrets: []
   replicas: 1
   resources:
     requests:
