@@ -49,3 +49,14 @@ apiserver:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+
+controller_manager:
+  image: k8s.gcr.io/kube-controller-manager:v1.18.0
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
