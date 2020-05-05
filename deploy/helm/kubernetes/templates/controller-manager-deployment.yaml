@@ -16,9 +16,9 @@ spec:
       labels:
         app: "{{ $fullName }}-controller-manager"
     spec:
-      {{- if .Values.controllerManager.image.PullSecrets }}
+      {{- with .Values.controllerManager.image.PullSecrets }}
       imagePullSecrets:
-        {{- toYaml .Values.controllerManager.image.PullSecrets | nindent 10 }}
+        {{- toYaml . | nindent 10 }}
       {{- end }}
       automountServiceAccountToken: false
       containers:

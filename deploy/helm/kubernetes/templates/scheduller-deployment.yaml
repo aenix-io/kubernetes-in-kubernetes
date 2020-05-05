@@ -16,9 +16,9 @@ spec:
       labels:
         app: "{{ $fullName }}-scheduller"
     spec:
-      {{- if .Values.scheduller.image.PullSecrets }}
+      {{- with .Values.scheduller.image.PullSecrets }}
       imagePullSecrets:
-        {{- toYaml .Values.scheduller.image.PullSecrets | nindent 10 }}
+        {{- toYaml . | nindent 10 }}
       {{- end }}
       automountServiceAccountToken: false
       containers:

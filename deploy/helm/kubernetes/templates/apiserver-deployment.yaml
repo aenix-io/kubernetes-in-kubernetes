@@ -16,9 +16,9 @@ spec:
       labels:
         app: "{{ $fullName }}-apiserver"
     spec:
-      {{- if .Values.apiserver.image.PullSecrets }}
+      {{- with .Values.apiserver.image.PullSecrets }}
       imagePullSecrets:
-        {{- toYaml .Values.apiserver.image.PullSecrets | nindent 10 }}
+        {{- toYaml . | nindent 10 }}
       {{- end }}
       automountServiceAccountToken: false
       containers:
