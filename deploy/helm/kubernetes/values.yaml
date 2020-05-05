@@ -27,7 +27,6 @@ etcd:
     #   cpu: 100m
     #   memory: 128Mi
 
-
 scheduller:
   image: k8s.gcr.io/kube-scheduler:v1.18.0
   replicas: 1
@@ -39,3 +38,14 @@ scheduller:
     #   cpu: 100m
     #   memory: 128Mi
 
+apiserver:
+  image: k8s.gcr.io/kube-apiserver:v1.18.0
+  service_cluster_ip_range: 10.96.0.0/12
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi

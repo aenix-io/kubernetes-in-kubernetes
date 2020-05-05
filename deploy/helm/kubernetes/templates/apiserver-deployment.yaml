@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-apiserver"
 spec:
-  replicas: 1
+  replicas: {{ .Values.apiserver.replicas }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-apiserver"
@@ -42,19 +42,17 @@ spec:
         - --requestheader-username-headers=X-Remote-User
         - --secure-port=6443
         - --service-account-key-file=/pki/sa/sa.pub
-        - --service-cluster-ip-range=10.96.0.0/12
+        - --service-cluster-ip-range={{ .Values.apiserver.service_cluster_ip_range }}
         - --tls-cert-file=/pki/apiserver/tls.crt
         - --tls-private-key-file=/pki/apiserver/tls.key
-        image: k8s.gcr.io/kube-apiserver:v1.18.0
+        image: {{ .Values.apiserver.image }}
         ports:
         - containerPort: 6443
           name: client
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
-            host: 127.0.0.1
-            host: 127.0.0.1
             path: /healthz
             port: 6443
             scheme: HTTPS
@@ -62,8 +60,7 @@ spec:
           timeoutSeconds: 15
         name: kube-apiserver
         resources:
-          requests:
-            cpu: 250m
+{{ toYaml .Values.apiserver.resources | indent 10 }}
         volumeMounts:
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client
@@ -75,7 +72,6 @@ spec:
           name: pki-apiserver-kubelet-client
         - mountPath: /pki/sa
           name: pki-sa
-
       volumes:
       - secret:
           secretName: "{{ $fullName }}-pki-front-proxy-client"
