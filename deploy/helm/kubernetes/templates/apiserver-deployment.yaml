@@ -52,7 +52,7 @@ spec:
         ports:
         - containerPort: 6443
           name: client
-        image: {{ .Values.scheduller.apiserver.repository }}:{{ .Values.apiserver.image.tag }}
+        image: {{ .Values.apiserver.repository }}:{{ .Values.apiserver.image.tag }}
         imagePullPolicy: {{ .Values.apiserver.imagePullPolicy }}
         livenessProbe:
           failureThreshold: 8
