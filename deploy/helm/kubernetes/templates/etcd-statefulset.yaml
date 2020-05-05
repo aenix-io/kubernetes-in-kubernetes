@@ -109,7 +109,7 @@ spec:
       - emptyDir: {}
         name: etcd-data
       {{- end }}
-  {{- if and .Values.etcd.persistence.enabled }}
+  {{- if .Values.etcd.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
       name: etcd-data
