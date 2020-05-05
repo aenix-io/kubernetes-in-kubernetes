@@ -36,8 +36,10 @@ spec:
       labels:
         app: {{ $fullName }}-etcd
     spec:
+      {{- if .Values.etcd.image.PullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.etcd.image.PullSecrets | nindent 10 }}
+      {{- end }}
       automountServiceAccountToken: false
       containers:
       - command:
