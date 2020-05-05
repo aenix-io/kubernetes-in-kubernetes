@@ -4,15 +4,21 @@ apiServer:
     dnsNames: []
     ipAddresses: []
 
-persistence:
-  enabled: true
-  accessModes:
-    - ReadWriteOnce
-  size: 1Gi
-  # storageClassName: default
-  annotations: {}
-  finalizers:
-    - kubernetes.io/pvc-protection
+imagePullPolicy: IfNotPresent
+
+etcd:
+  image: k8s.gcr.io/etcd:3.4.3-0
+  podManagementPolicy: Parallel
+  replicas: 3
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+    # storageClassName: default
+    annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
 
 
 scheduller:
