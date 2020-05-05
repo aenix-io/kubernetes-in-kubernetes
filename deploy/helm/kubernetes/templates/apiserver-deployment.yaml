@@ -32,7 +32,7 @@ spec:
         - --etcd-cafile=/pki/apiserver-etcd-client/ca.crt
         - --etcd-certfile=/pki/apiserver-etcd-client/tls.crt
         - --etcd-keyfile=/pki/apiserver-etcd-client/tls.key
-        - "--etcd-servers=https://{{ $fullName }}-etcd-0.{{ $fullName }}-etcd:2379,https://{{ $fullName }}-etcd-1.{{ $fullName }}-etcd:2379,https://{{ $fullName }}-etcd-2.{{ $fullName }}-etcd:2379" # TODO
+        - --etcd-servers={{- range $k, $v := until (atoi (printf "%d" (int64 $.Values.etcd.replicas))) }}https://{{ $fullName }}-etcd-{{ $k }}.{{ $fullName }}-etcd:2379,{{ end }}
         - --insecure-port=0
         - --kubelet-client-certificate=/pki/apiserver-kubelet-client/tls.crt
         - --kubelet-client-key=/pki/apiserver-kubelet-client/tls.key
@@ -52,8 +52,8 @@ spec:
         ports:
         - containerPort: 6443
           name: client
-        image: {{ .Values.apiserver.repository }}:{{ .Values.apiserver.image.tag }}
-        imagePullPolicy: {{ .Values.apiserver.imagePullPolicy }}
+        image: {{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag }}
+        imagePullPolicy: {{ .Values.apiserver.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:

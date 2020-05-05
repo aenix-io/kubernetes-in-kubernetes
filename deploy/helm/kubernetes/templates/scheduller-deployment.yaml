@@ -30,7 +30,7 @@ spec:
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
         image: {{ .Values.scheduller.image.repository }}:{{ .Values.scheduller.image.tag }}
-        imagePullPolicy: {{ .Values.scheduller.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.scheduller.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
