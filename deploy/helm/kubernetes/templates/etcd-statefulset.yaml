@@ -49,7 +49,8 @@ spec:
         - --client-cert-auth=true
         - --data-dir=/var/lib/etcd
         - --initial-advertise-peer-urls=https://$(POD_NAME).{{ $fullName }}-etcd:2380
-        - --initial-cluster={{ $fullName }}-etcd-0=https://{{ $fullName }}-etcd-0.{{ $fullName }}-etcd:2380,{{ $fullName }}-etcd-1=https://{{ $fullName }}-etcd-1.{{ $fullName }}-etcd:2380,{{ $fullName }}-etcd-2=https://{{ $fullName }}-etcd-2.{{ $fullName }}-etcd:2380
+{{- $replicas := int (toString (.Values.etcd.replicas)) }}
+        - --initial-cluster={{- range $k, $v := until (atoi (printf "%d" (int64 $.Values.etcd.replicas))) }}{{ $fullName }}-etcd-{{ $k }}=https://{{ $fullName }}-etcd-{{ $k }}.{{ $fullName }}-etcd:2380{{ $k := add $k 1 }}{{ if lt $k $replicas }},{{ end }}{{ end }}
         - --initial-cluster-state=new
         - --initial-cluster-token={{ $fullName }}-etcd
         - --key-file=/pki/etcd/server/tls.key
