@@ -25,12 +25,11 @@ spec:
         - --bind-address=127.0.0.1
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
-        image: k8s.gcr.io/kube-scheduler:v1.18.0
+        image: {{ $.Values.scheduller.image }}
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 8
           httpGet:
-            host: 127.0.0.1
             path: /healthz
             port: 10259
             scheme: HTTPS
@@ -38,8 +37,7 @@ spec:
           timeoutSeconds: 15
         name: kube-scheduler
         resources:
-          requests:
-            cpu: 100m
+{{ toYaml $.Values.scheduller.resources | indent 10 }}
         volumeMounts:
         - mountPath: /etc/kubernetes/
           name: kubeconfig

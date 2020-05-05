@@ -14,3 +14,14 @@ persistence:
   finalizers:
     - kubernetes.io/pvc-protection
 
+
+scheduller:
+  image: k8s.gcr.io/kube-scheduler:v1.18.0
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
