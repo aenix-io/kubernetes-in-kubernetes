@@ -21,9 +21,10 @@ spec:
         {{- toYaml . | nindent 10 }}
       {{- end }}
       automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 5
       containers:
       - command: [ 'sleep', 'infinity' ]
-        image: {{ .Values.controllerManager.image.repository }}:{{ .Values.controllerManager.image.tag }}
+        image: {{ .Values.admin.image.repository }}:{{ .Values.admin.image.tag }}
         imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         name: admin
         resources:
