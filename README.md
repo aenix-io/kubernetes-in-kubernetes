@@ -14,25 +14,25 @@ Deploy Kubernetes in Kubernetes using Helm
 
 ### Preparation
 
-Install cert-manager:
+* Install [cert-manager].
 
-```bash
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.14.3/cert-manager.yaml
-```
+* If you running over [minikube] you might also need to install a provisioner, you can use [local-path-provisioner] for example.
 
-If you running over [minikube](https://github.com/kubernetes/minikube) you also need to use provisioner, you can use [local-path-provisioner](https://github.com/rancher/local-path-provisioner) for example:
+* Clone repo locally and cd to helm charts directory:
+  ```bash
+  git clone https://github.com/kvaps/kubernetes-in-kubernetes
+  cd kubernetes-in-kubernetes/deploy/helm
+  ```
 
-```bash
-kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-```
+[cert-manager]: https://cert-manager.io/docs/installation
+[minikube]: https://github.com/kubernetes/minikube
+[local-path-provisioner]: https://github.com/rancher/local-path-provisioner#installation
 
 ### Installation
 
 ```bash
 kubectl create ns kubernetes
-git clone https://github.com/kvaps/kubernetes-in-kubernetes
-helm upgrade --install -n kubernetes foo kubernetes-in-kubernetes/deploy/helm/kubernetes
-kubectl exec -n kubernetes -ti `kubectl get pod -n kubernetes -l app=foo-kubernetes-admin -o name` -- sh
+helm upgrade --install -n kubernetes foo kubernetes --wait
 ```
 
 ### Cleanup
