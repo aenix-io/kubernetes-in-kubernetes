@@ -2,7 +2,7 @@
 
 Deploy Kubernetes in Kubernetes using Helm
 
-> Warning: This project on heavy development and not ready for production use!
+![demo](https://gist.githubusercontent.com/kvaps/3cc5d772d750f8f2d36a76d00c3342b1/raw/8d127a5efe738d82c18bfc70a0c460299cf404b5/kubernetes-in-kubernetes.gif)
 
 ## Requirements
 
