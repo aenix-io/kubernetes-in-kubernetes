@@ -8,10 +8,13 @@ metadata:
   labels:
     app: {{ $fullName }}-controller-manager
 spec:
-  type: NodePort
+  type: {{ .Values.controllerManager.service.type }}
   ports:
   - port: {{ .Values.controllerManager.service.port }}
     name: client
+    {{- with .Values.controllerManager.service.nodePort }}
+    nodePort: {{ . }}
+    {{- end }}
   selector:
     app: {{ $fullName }}-controller-manager
 {{- end }}

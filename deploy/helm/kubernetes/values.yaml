@@ -31,6 +31,7 @@ etcd:
     peer: 2380
     metrics: 2381
   service:
+    type: ClusterIP
     ports:
       client: 2379
       peer: 2380
@@ -42,7 +43,6 @@ apiserver:
     tag: v1.18.2
     PullPolicy: IfNotPresent
     PullSecrets: []
-  serviceClusterIPRange: 10.96.0.0/12
   replicaCount: 1
   resources:
     requests:
@@ -56,12 +56,16 @@ apiserver:
     dnsNames: []
     ipAddresses: []
 
+  serviceClusterIPRange: 10.96.0.0/12
   extraArgs: {}
 
   port: 6443
   service:
     enabled: true
+    type: NodePort
     port: 6443
+    # Specify nodePort for apiserver service (30000-32767)
+    nodePort:
 
 controllerManager:
   image:
@@ -82,6 +86,7 @@ controllerManager:
   port: 10257
   service:
     enabled: true
+    type: ClusterIP
     port: 10257
 
 scheduler:
@@ -103,6 +108,7 @@ scheduler:
   port: 10259
   service:
     enabled: true
+    type: ClusterIP
     port: 10259
 
 admin:

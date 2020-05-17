@@ -8,10 +8,13 @@ metadata:
   labels:
     app: {{ $fullName }}-apiserver
 spec:
-  type: NodePort
+  type: {{ .Values.apiserver.service.type }}
   ports:
   - port: {{ .Values.apiserver.service.port }}
     name: client
+    {{- with .Values.apiserver.service.nodePort }}
+    nodePort: {{ . }}
+    {{- end }}
   selector:
     app: {{ $fullName }}-apiserver
 {{- end }}

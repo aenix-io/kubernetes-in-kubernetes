@@ -8,10 +8,13 @@ metadata:
   labels:
     app: {{ $fullName }}-scheduler
 spec:
-  type: NodePort
+  type: {{ .Values.scheduler.service.type }}
   ports:
   - port: {{ .Values.scheduler.service.port }}
     name: client
+    {{- with .Values.scheduler.service.nodePort }}
+    nodePort: {{ . }}
+    {{- end }}
   selector:
     app: {{ $fullName }}-scheduler
 {{- end }}

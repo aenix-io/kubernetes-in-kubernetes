@@ -10,6 +10,7 @@ metadata:
 spec:
   replicas: {{ .Values.etcd.replicaCount }}
   serviceName: {{ $fullName }}-etcd
+  podManagementPolicy: Parallel
   selector:
     matchLabels:
       app: {{ $fullName }}-etcd
