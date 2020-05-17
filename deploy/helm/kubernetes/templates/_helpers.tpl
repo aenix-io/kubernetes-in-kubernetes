@@ -24,11 +24,11 @@ Generate etcd servers list.
 */}}
 {{- define "kubernetes.etcdServers4ApiServer" -}}
   {{- $fullName := include "kubernetes.fullname" . -}}
-  {{- range $etcdcount, $e := until (.Values.etcd.replicas|int) -}}
+  {{- range $etcdcount, $e := until (int .Values.etcd.replicaCount) -}}
     {{- printf "https://" -}}
     {{- printf "%s-etcd-%d." $fullName $etcdcount -}}
-    {{- printf "%s-etcd:%d" $fullName 2379 -}}
-    {{- if lt $etcdcount  ( sub ($.Values.etcd.replicas|int) 1 ) -}}
+    {{- printf "%s-etcd:%d" $fullName (int $.Values.etcd.ports.client) -}}
+    {{- if lt $etcdcount (sub (int $.Values.etcd.replicaCount) 1 ) -}}
       {{- printf "," -}}
     {{- end -}}
   {{- end -}}
@@ -36,12 +36,12 @@ Generate etcd servers list.
 
 {{- define "kubernetes.etcdServers4InitialCluster" -}}
   {{- $fullName := include "kubernetes.fullname" . -}}
-  {{- range $etcdcount, $e := until (.Values.etcd.replicas|int) -}}
+  {{- range $etcdcount, $e := until (int .Values.etcd.replicaCount) -}}
     {{- printf "%s-etcd-%d=" $fullName $etcdcount -}}
     {{- printf "https://" -}}
     {{- printf "%s-etcd-%d." $fullName $etcdcount -}}
-    {{- printf "%s-etcd:%d" $fullName 2380 -}}
-    {{- if lt $etcdcount  ( sub ($.Values.etcd.replicas|int) 1 ) -}}
+    {{- printf "%s-etcd:%d" $fullName (int $.Values.etcd.ports.peer) -}}
+    {{- if lt $etcdcount (sub (int $.Values.etcd.replicaCount) 1 ) -}}
       {{- printf "," -}}
     {{- end -}}
   {{- end -}}

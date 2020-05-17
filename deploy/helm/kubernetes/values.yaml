@@ -1,10 +1,14 @@
 controlPlaneEndpoint:
-apiServer:
-  certSANs:
-    dnsNames: []
-    ipAddresses: []
 
-imagePullPolicy: IfNotPresent
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  # storageClassName: default
+  annotations: {}
+  finalizers:
+    - kubernetes.io/pvc-protection
 
 etcd:
   image:
@@ -12,16 +16,7 @@ etcd:
     tag: 3.4.3-0
     PullPolicy: IfNotPresent
     PullSecrets: []
-  replicas: 3
-  persistence:
-    enabled: true
-    accessModes:
-      - ReadWriteOnce
-    size: 1Gi
-    # storageClassName: default
-    annotations: {}
-    finalizers:
-      - kubernetes.io/pvc-protection
+  replicaCount: 3
   resources:
     requests:
       cpu: 100m
@@ -29,30 +24,26 @@ etcd:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+  extraArgs: {}
 
-scheduller:
-  image:
-    repository: k8s.gcr.io/kube-scheduler
-    tag: v1.18.0
-    PullPolicy: IfNotPresent
-    PullSecrets: []
-  replicas: 1
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
+  ports:
+    client: 2379
+    peer: 2380
+    metrics: 2381
+  service:
+    ports:
+      client: 2379
+      peer: 2380
+      metrics: 2381
 
 apiserver:
   image:
     repository: k8s.gcr.io/kube-apiserver
-    tag: v1.18.0
+    tag: v1.18.2
     PullPolicy: IfNotPresent
     PullSecrets: []
   serviceClusterIPRange: 10.96.0.0/12
-  replicas: 1
+  replicaCount: 1
   resources:
     requests:
       cpu: 100m
@@ -61,13 +52,24 @@ apiserver:
     #   cpu: 100m
     #   memory: 128Mi
 
+  certSANs:
+    dnsNames: []
+    ipAddresses: []
+
+  extraArgs: {}
+
+  port: 6443
+  service:
+    enabled: true
+    port: 6443
+
 controllerManager:
   image:
     repository: k8s.gcr.io/kube-controller-manager
-    tag: v1.18.0
+    tag: v1.18.2
     PullPolicy: IfNotPresent
     PullSecrets: []
-  replicas: 1
+  replicaCount: 1
   resources:
     requests:
       cpu: 100m
@@ -75,6 +77,33 @@ controllerManager:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+  extraArgs: {}
+
+  port: 10257
+  service:
+    enabled: true
+    port: 10257
+
+scheduler:
+  image:
+    repository: k8s.gcr.io/kube-scheduler
+    tag: v1.18.2
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+  extraArgs: {}
+
+  port: 10259
+  service:
+    enabled: true
+    port: 10259
 
 admin:
   image:
@@ -82,7 +111,7 @@ admin:
     tag: v0.0.1
     PullPolicy: IfNotPresent
     PullSecrets: []
-  replicas: 1
+  replicaCount: 1
   resources:
     requests:
       cpu: 100m

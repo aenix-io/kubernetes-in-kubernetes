@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-apiserver"
 spec:
-  replicas: {{ .Values.apiserver.replicas }}
+  replicas: {{ .Values.apiserver.replicaCount }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-apiserver"
@@ -26,6 +26,7 @@ spec:
         - kube-apiserver
         - --allow-privileged=true
         - --authorization-mode=Node,RBAC
+        - --bind-address=0.0.0.0
         - --client-ca-file=/pki/apiserver/ca.crt
         - --enable-admission-plugins=NodeRestriction
         - --enable-bootstrap-token-auth=true
@@ -44,13 +45,16 @@ spec:
         - --requestheader-extra-headers-prefix=X-Remote-Extra-
         - --requestheader-group-headers=X-Remote-Group
         - --requestheader-username-headers=X-Remote-User
-        - --secure-port=6443
+        - --secure-port={{ .Values.apiserver.port }}
         - --service-account-key-file=/pki/sa/sa.pub
         - --service-cluster-ip-range={{ .Values.apiserver.serviceClusterIPRange }}
         - --tls-cert-file=/pki/apiserver/tls.crt
         - --tls-private-key-file=/pki/apiserver/tls.key
+        {{- range $key, $value := .Values.apiserver.extraArgs }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
         ports:
-        - containerPort: 6443
+        - containerPort: {{ .Values.apiserver.port }}
           name: client
         image: {{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag }}
         imagePullPolicy: {{ .Values.apiserver.image.PullPolicy }}
@@ -58,7 +62,7 @@ spec:
           failureThreshold: 8
           httpGet:
             path: /healthz
-            port: 6443
+            port: {{ .Values.apiserver.port }}
             scheme: HTTPS
           initialDelaySeconds: 15
           timeoutSeconds: 15

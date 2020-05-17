@@ -1,23 +1,6 @@
 {{- if not .Values.genCa }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ $fullName }}-etcd
-  labels:
-    app: {{ $fullName }}-etcd
-spec:
-  publishNotReadyAddresses: true
-  clusterIP: None
-  ports:
-  - port: 2379
-    name: client
-  - port: 2380
-    name: peer
-  selector:
-    app: {{ $fullName }}-etcd
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -25,7 +8,7 @@ metadata:
   labels:
     app: {{ $fullName }}-etcd
 spec:
-  replicas: {{ .Values.etcd.replicas }}
+  replicas: {{ .Values.etcd.replicaCount }}
   serviceName: {{ $fullName }}-etcd
   selector:
     matchLabels:
@@ -44,18 +27,18 @@ spec:
       containers:
       - command:
         - etcd
-        - --advertise-client-urls=https://$(POD_NAME).{{ $fullName }}-etcd:2379
+        - --advertise-client-urls=https://$(POD_NAME).{{ $fullName }}-etcd:{{ .Values.etcd.ports.client }}
         - --cert-file=/pki/etcd/server/tls.crt
         - --client-cert-auth=true
         - --data-dir=/var/lib/etcd
-        - --initial-advertise-peer-urls=https://$(POD_NAME).{{ $fullName }}-etcd:2380
+        - --initial-advertise-peer-urls=https://$(POD_NAME).{{ $fullName }}-etcd:{{ .Values.etcd.ports.peer }}
         - --initial-cluster={{ template "kubernetes.etcdServers4InitialCluster" . }}
         - --initial-cluster-state=new
         - --initial-cluster-token={{ $fullName }}-etcd
         - --key-file=/pki/etcd/server/tls.key
-        - --listen-client-urls=https://0.0.0.0:2379
-        - --listen-metrics-urls=http://0.0.0.0:2381
-        - --listen-peer-urls=https://0.0.0.0:2380
+        - --listen-client-urls=https://0.0.0.0:{{ .Values.etcd.ports.client }}
+        - --listen-peer-urls=https://0.0.0.0:{{ .Values.etcd.ports.peer }}
+        - --listen-metrics-urls=http://0.0.0.0:{{ .Values.etcd.ports.metrics }}
         - --name=$(POD_NAME)
         - --peer-cert-file=/pki/etcd/peer/tls.crt
         - --peer-client-cert-auth=true
@@ -63,6 +46,9 @@ spec:
         - --peer-trusted-ca-file=/pki/etcd/ca/tls.crt
         - --snapshot-count=10000
         - --trusted-ca-file=/pki/etcd/ca/tls.crt
+        {{- range $key, $value := .Values.etcd.extraArgs }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
         env:
         - name: POD_NAME
           valueFrom:
@@ -70,16 +56,18 @@ spec:
               fieldPath: metadata.name
         image: {{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag }}
         ports:
-        - containerPort: 2379
+        - containerPort: {{ .Values.etcd.ports.client }}
           name: client
-        - containerPort: 2380
+        - containerPort: {{ .Values.etcd.ports.peer }}
           name: peer
+        - containerPort: {{ .Values.etcd.ports.metrics }}
+          name: metrics
         imagePullPolicy: {{ .Values.etcd.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
             path: /health
-            port: 2381
+            port: {{ .Values.etcd.ports.metrics }}
             scheme: HTTP
           initialDelaySeconds: 15
           timeoutSeconds: 15
@@ -105,37 +93,37 @@ spec:
       - secret:
           secretName: {{ $fullName }}-pki-etcd-server
         name: pki-etcd-certs-server
-      {{- if not .Values.etcd.persistence.enabled }}
+      {{- if not .Values.persistence.enabled }}
       - emptyDir: {}
         name: etcd-data
       {{- end }}
-  {{- if .Values.etcd.persistence.enabled }}
+  {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
       name: etcd-data
       labels:
         app: {{ $fullName }}-etcd
-        {{- if .Values.etcd.persistence.labels }}
-        {{- toYaml .Values.etcd.persistence.labels | nindent 4 }}
+        {{- if .Values.persistence.labels }}
+        {{- toYaml .Values.persistence.labels | nindent 4 }}
         {{- end }}
-      {{- with .Values.etcd.persistence.annotations  }}
+      {{- with .Values.persistence.annotations  }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.etcd.persistence.finalizers  }}
+      {{- with .Values.persistence.finalizers  }}
       finalizers:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
       accessModes:
-        {{- range .Values.etcd.persistence.accessModes }}
+        {{- range .Values.persistence.accessModes }}
         - {{ . | quote }}
         {{- end }}
-      {{- if .Values.etcd.persistence.storageClassName }}
-      storageClassName: {{ .Values.etcd.persistence.storageClassName }}
+      {{- if .Values.persistence.storageClassName }}
+      storageClassName: {{ .Values.persistence.storageClassName }}
       {{- end }}
       resources:
         requests:
-          storage: {{ .Values.etcd.persistence.size | quote }}
+          storage: {{ .Values.persistence.size | quote }}
   {{- end }}
 {{- end }}

@@ -1,0 +1,17 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+{{- if .Values.controllerManager.service.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-controller-manager
+  labels:
+    app: {{ $fullName }}-controller-manager
+spec:
+  type: NodePort
+  ports:
+  - port: {{ .Values.controllerManager.service.port }}
+    name: client
+  selector:
+    app: {{ $fullName }}-controller-manager
+{{- end }}

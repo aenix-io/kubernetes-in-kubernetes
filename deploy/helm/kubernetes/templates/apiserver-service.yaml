@@ -1,4 +1,5 @@
 {{- $fullName := include "kubernetes.fullname" . -}}
+{{- if .Values.apiserver.service.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -8,9 +9,9 @@ metadata:
     app: {{ $fullName }}-apiserver
 spec:
   type: NodePort
-  publishNotReadyAddresses: true
   ports:
-  - port: 6443
+  - port: {{ .Values.apiserver.service.port }}
     name: client
   selector:
     app: {{ $fullName }}-apiserver
+{{- end }}

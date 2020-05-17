@@ -1,0 +1,22 @@
+{{- if not .Values.genCa }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-etcd
+  labels:
+    app: {{ $fullName }}-etcd
+spec:
+  publishNotReadyAddresses: true
+  clusterIP: None
+  ports:
+  - port: {{ .Values.etcd.service.ports.client }}
+    name: client
+  - port: {{ .Values.etcd.service.ports.peer }}
+    name: peer
+  - port: {{ .Values.etcd.service.ports.metrics }}
+    name: metrics
+  selector:
+    app: {{ $fullName }}-etcd
+{{- end }}

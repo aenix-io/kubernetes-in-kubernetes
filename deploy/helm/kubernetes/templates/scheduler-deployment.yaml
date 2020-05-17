@@ -3,20 +3,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ $fullName }}-scheduller"
+  name: "{{ $fullName }}-scheduler"
   labels:
-    app: "{{ $fullName }}-scheduller"
+    app: "{{ $fullName }}-scheduler"
 spec:
-  replicas: {{ .Values.scheduller.replicas }}
+  replicas: {{ .Values.scheduler.replicaCount }}
   selector:
     matchLabels:
-      app: "{{ $fullName }}-scheduller"
+      app: "{{ $fullName }}-scheduler"
   template:
     metadata:
       labels:
-        app: "{{ $fullName }}-scheduller"
+        app: "{{ $fullName }}-scheduler"
     spec:
-      {{- with .Values.scheduller.image.PullSecrets }}
+      {{- with .Values.scheduler.image.PullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
@@ -29,19 +29,23 @@ spec:
         - --bind-address=0.0.0.0
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
-        image: {{ .Values.scheduller.image.repository }}:{{ .Values.scheduller.image.tag }}
-        imagePullPolicy: {{ .Values.scheduller.image.PullPolicy }}
+        - --secure-port={{ .Values.scheduler.port }}
+        {{- range $key, $value := .Values.scheduler.extraArgs }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
+        image: {{ .Values.scheduler.image.repository }}:{{ .Values.scheduler.image.tag }}
+        imagePullPolicy: {{ .Values.scheduler.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
             path: /healthz
-            port: 10259
+            port: {{ .Values.scheduler.port }}
             scheme: HTTPS
           initialDelaySeconds: 15
           timeoutSeconds: 15
         name: kube-scheduler
         resources:
-          {{- toYaml .Values.scheduller.resources | nindent 10 }}
+          {{- toYaml .Values.scheduler.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /etc/kubernetes/
           name: kubeconfig

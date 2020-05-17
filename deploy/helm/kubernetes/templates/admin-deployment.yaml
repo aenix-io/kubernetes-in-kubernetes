@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-admin"
 spec:
-  replicas: {{ .Values.admin.replicas }}
+  replicas: {{ .Values.admin.replicaCount }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-admin"

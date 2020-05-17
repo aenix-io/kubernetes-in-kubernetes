@@ -1,0 +1,17 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+{{- if .Values.scheduler.service.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-scheduler
+  labels:
+    app: {{ $fullName }}-scheduler
+spec:
+  type: NodePort
+  ports:
+  - port: {{ .Values.scheduler.service.port }}
+    name: client
+  selector:
+    app: {{ $fullName }}-scheduler
+{{- end }}

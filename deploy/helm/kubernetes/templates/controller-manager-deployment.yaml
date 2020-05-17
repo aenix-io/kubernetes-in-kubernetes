@@ -7,7 +7,7 @@ metadata:
   labels:
     app: "{{ $fullName }}-controller-manager"
 spec:
-  replicas: {{ .Values.controllerManager.replicas }}
+  replicas: {{ .Values.controllerManager.replicaCount }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-controller-manager"
@@ -36,15 +36,19 @@ spec:
         - --leader-elect=true
         - --requestheader-client-ca-file=/pki/front-proxy-client/tls.crt
         - --root-ca-file=/pki/ca/tls.crt
+        - --secure-port={{ .Values.controllerManager.port }}
         - --service-account-private-key-file=/pki/kubernetes-sa/sa.key
         - --use-service-account-credentials=true
+        {{- range $key, $value := .Values.controllerManager.extraArgs }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
         image: {{ .Values.controllerManager.image.repository }}:{{ .Values.controllerManager.image.tag }}
         imagePullPolicy: {{ .Values.controllerManager.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
             path: /healthz
-            port: 10257
+            port: {{ .Values.controllerManager.port }}
             scheme: HTTPS
           initialDelaySeconds: 15
           timeoutSeconds: 15
