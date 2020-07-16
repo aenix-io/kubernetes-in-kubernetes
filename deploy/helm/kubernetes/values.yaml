@@ -40,7 +40,7 @@ etcd:
 apiserver:
   image:
     repository: k8s.gcr.io/kube-apiserver
-    tag: v1.18.2
+    tag: v1.18.6
     PullPolicy: IfNotPresent
     PullSecrets: []
   replicaCount: 1
@@ -70,7 +70,7 @@ apiserver:
 controllerManager:
   image:
     repository: k8s.gcr.io/kube-controller-manager
-    tag: v1.18.2
+    tag: v1.18.6
     PullPolicy: IfNotPresent
     PullSecrets: []
   replicaCount: 1
@@ -92,7 +92,7 @@ controllerManager:
 scheduler:
   image:
     repository: k8s.gcr.io/kube-scheduler
-    tag: v1.18.2
+    tag: v1.18.6
     PullPolicy: IfNotPresent
     PullSecrets: []
   replicaCount: 1
