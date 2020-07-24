@@ -1,32 +1,5 @@
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: "{{ $fullName }}-kubeadm-tasks"
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: "{{ $fullName }}-kubeadm-tasks"
-rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "list", "watch", "create", "delete", "update", "patch"]
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: "{{ $fullName }}-kubeadm-tasks"
-subjects:
-- kind: ServiceAccount
-  name: "{{ $fullName }}-kubeadm-tasks"
-  namespace: "{{ .Release.Namespace }}"
-roleRef:
-  kind: Role
-  name: "{{ $fullName }}-kubeadm-tasks"
-  apiGroup: rbac.authorization.k8s.io
----
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -46,8 +19,8 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: kubeadm
-        image: docker.io/kvaps/kubernetes-tools:v0.0.1
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        image: {{ .Values.admin.image.repository }}:{{ .Values.admin.image.tag }}
+        imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         command: [ '/scripts/configure-cluster.sh' ]
         env:
         - name: FULL_NAME

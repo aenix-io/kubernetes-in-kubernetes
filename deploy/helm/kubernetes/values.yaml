@@ -125,3 +125,8 @@ admin:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+
+  job:
+    schedule: "0 0 1 */6 *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3

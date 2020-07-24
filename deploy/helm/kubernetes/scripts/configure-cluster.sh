@@ -31,22 +31,26 @@ imageRepository: k8s.gcr.io
 controlPlaneEndpoint: "${FULL_NAME}-apiserver:6443"
 EOT
 
-if ! kubectl get secret "${FULL_NAME}-pki-sa" >/dev/null 2>&1; then
+if [ -z "$(kubectl get secret  "${FULL_NAME}-pki-sa" -o jsonpath='{.data}')" ]; then
   kubeadm init phase certs sa
-  kubectl create secret generic "${FULL_NAME}-pki-sa" --from-file=/etc/kubernetes/pki/sa.pub --from-file=/etc/kubernetes/pki/sa.key
+  kubectl patch secret "${FULL_NAME}-pki-sa" --type merge \
+    -p "{\"data\":{\"sa.pub\":\"$(base64 /etc/kubernetes/pki/sa.pub | tr -d '\n')\", \"sa.key\":\"$(base64 /etc/kubernetes/pki/sa.key | tr -d '\n')\" }}"
 fi
 
 rm -f /etc/kubernetes/admin.conf
 kubeadm init phase kubeconfig admin --config kubeadmcfg.yaml
-kubectl create secret generic "${FULL_NAME}-admin-conf" --from-file=/etc/kubernetes/admin.conf --dry-run=client -o yaml | kubectl apply -f -
+kubectl patch secret "${FULL_NAME}-admin-conf" --type merge \
+  -p "{\"data\":{\"admin.conf\":\"$(base64 /etc/kubernetes/admin.conf | tr -d '\n')\" }}"
 
 rm -f /etc/kubernetes/controller-manager.conf
 kubeadm init phase kubeconfig controller-manager --config kubeadmcfg.yaml
-kubectl create secret generic "${FULL_NAME}-controller-manager-conf" --from-file=/etc/kubernetes/controller-manager.conf --dry-run=client -o yaml | kubectl apply -f -
+kubectl patch secret "${FULL_NAME}-controller-manager-conf" --type merge \
+  -p "{\"data\":{\"controller-manager.conf\":\"$(base64 /etc/kubernetes/controller-manager.conf | tr -d '\n')\" }}"
 
 rm -f /etc/kubernetes/scheduler.conf
 kubeadm init phase kubeconfig scheduler --config kubeadmcfg.yaml
-kubectl create secret generic "${FULL_NAME}-scheduler-conf" --from-file=/etc/kubernetes/scheduler.conf --dry-run=client -o yaml | kubectl apply -f -
+kubectl patch secret "${FULL_NAME}-scheduler-conf" --type merge \
+  -p "{\"data\":{\"scheduler.conf\":\"$(base64 /etc/kubernetes/scheduler.conf | tr -d '\n')\" }}"
 
 # wait for cluster
 echo "Waiting for api-server endpoint ${FULL_NAME}-apiserver:6443..."
@@ -61,7 +65,8 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # upload configuration
 kubeadm init phase upload-config kubeadm --config /config/kubeadmcfg.yaml
-kubectl --kubeconfig /etc/kubernetes/admin.conf patch configmap -n kube-system kubeadm-config -p '{"data":{"ClusterStatus":"apiEndpoints: {}\napiVersion: kubeadm.k8s.io/v1beta2\nkind: ClusterStatus"}}'
+kubectl --kubeconfig /etc/kubernetes/admin.conf patch configmap -n kube-system kubeadm-config \
+  -p '{"data":{"ClusterStatus":"apiEndpoints: {}\napiVersion: kubeadm.k8s.io/v1beta2\nkind: ClusterStatus"}}'
 
 # upload configuration
 kubeadm init phase upload-config kubelet --config /config/kubeadmcfg.yaml -v1 2>&1 \

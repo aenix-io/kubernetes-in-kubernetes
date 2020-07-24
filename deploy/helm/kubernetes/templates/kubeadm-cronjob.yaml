@@ -1,0 +1,22 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+  labels:
+    app: "{{ $fullName }}-kubeadm-tasks"
+spec:
+  schedule: "{{ .Values.admin.job.schedule }}"
+  successfulJobsHistoryLimit: {{ .Values.admin.job.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.admin.job.failedJobsHistoryLimit }}
+  jobTemplate:
+    metadata:
+      labels:
+        app: "{{ $fullName }}-kubeadm-tasks"
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/kubeadm-config.yaml") . | sha256sum }}
+        checksum/scripts: {{ include (print $.Template.BasePath "/kubeadm-scripts.yaml") . | sha256sum }}
+    spec:
+      template:
+        {{- (include (print $.Template.BasePath "/kubeadm-job.yaml") . | fromYaml ).spec.template | toYaml | nindent 8 }}

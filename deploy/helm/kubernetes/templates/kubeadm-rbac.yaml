@@ -1,0 +1,33 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "patch"]
+  resourceNames:
+  - "{{ $fullName }}-pki-sa"
+  - "{{ $fullName }}-admin-conf"
+  - "{{ $fullName }}-controller-manager-conf"
+  - "{{ $fullName }}-scheduler-conf"
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "{{ $fullName }}-kubeadm-tasks"
+subjects:
+- kind: ServiceAccount
+  name: "{{ $fullName }}-kubeadm-tasks"
+  namespace: "{{ .Release.Namespace }}"
+roleRef:
+  kind: Role
+  name: "{{ $fullName }}-kubeadm-tasks"
+  apiGroup: rbac.authorization.k8s.io
