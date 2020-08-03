@@ -7,6 +7,10 @@ metadata:
   name: {{ $fullName }}-apiserver
   labels:
     app: {{ $fullName }}-apiserver
+  {{- with .Values.apiserver.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.apiserver.service.type }}
   ports:

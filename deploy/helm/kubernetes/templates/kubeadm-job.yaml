@@ -11,6 +11,9 @@ spec:
     metadata:
       labels:
         app: "{{ $fullName }}-kubeadm-tasks"
+      annotations:
+        helm.sh/hook: post-install
+        helm.sh/hook-delete-policy: before-hook-creation
       #annotations:
       #  checksum/config: {{ include (print $.Template.BasePath "/kubeadm-config.yaml") . | sha256sum }}
       #  checksum/scripts: {{ include (print $.Template.BasePath "/kubeadm-scripts.yaml") . | sha256sum }}

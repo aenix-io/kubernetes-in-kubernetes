@@ -66,6 +66,7 @@ apiserver:
     port: 6443
     # Specify nodePort for apiserver service (30000-32767)
     nodePort:
+    annotations: {}
 
 controllerManager:
   image:
