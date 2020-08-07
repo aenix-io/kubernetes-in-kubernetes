@@ -177,7 +177,7 @@ admin:
   enabled: true
   image:
     repository: docker.io/kvaps/kubernetes-tools
-    tag: v0.0.1
+    tag: v0.1.0
     PullPolicy: IfNotPresent
     PullSecrets: []
   replicaCount: 1
