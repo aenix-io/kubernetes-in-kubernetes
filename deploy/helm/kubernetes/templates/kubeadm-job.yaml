@@ -1,3 +1,4 @@
+{{- if .Values.admin.job.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: batch/v1
@@ -6,18 +7,46 @@ metadata:
   name: "{{ $fullName }}-kubeadm-tasks"
   labels:
     app: "{{ $fullName }}-kubeadm-tasks"
+    {{- with .Values.admin.job.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.admin.job.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   template:
     metadata:
       labels:
         app: "{{ $fullName }}-kubeadm-tasks"
+        {{- with .Values.admin.job.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         helm.sh/hook: post-install
         helm.sh/hook-delete-policy: before-hook-creation
-      #annotations:
-      #  checksum/config: {{ include (print $.Template.BasePath "/kubeadm-config.yaml") . | sha256sum }}
-      #  checksum/scripts: {{ include (print $.Template.BasePath "/kubeadm-scripts.yaml") . | sha256sum }}
+        #checksum/config: {{ include (print $.Template.BasePath "/kubeadm-config.yaml") . | sha256sum }}
+        #checksum/scripts: {{ include (print $.Template.BasePath "/kubeadm-scripts.yaml") . | sha256sum }}
+        {{- with .Values.admin.job.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
+      {{- with .Values.admin.job.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.job.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.admin.job.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 10 }}
+      {{- end }}
       serviceAccountName: "{{ $fullName }}-kubeadm-tasks"
       restartPolicy: OnFailure
       containers:
@@ -31,6 +60,9 @@ spec:
         {{- with .Values.controlPlaneEndpoint }}
         - name: CONTROL_PLANE_ENDPOINT
           value: "{{ . }}"
+        {{- end }}
+        {{- with .Values.admin.job.extraEnv }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
         volumeMounts:
         - mountPath: /pki/front-proxy-client
@@ -75,3 +107,4 @@ spec:
       - name: config
         configMap:
           name: "{{ $fullName }}-kubeadm-config"
+{{- end }}

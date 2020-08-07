@@ -11,6 +11,7 @@ persistence:
     - kubernetes.io/pvc-protection
 
 etcd:
+  enabled: true
   image:
     repository: k8s.gcr.io/etcd
     tag: 3.4.3-0
@@ -24,20 +25,36 @@ etcd:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+
   extraArgs: {}
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+  sidecars: []
+  extraVolumes: []
+  extraVolumeMounts: []
 
   ports:
     client: 2379
     peer: 2380
     metrics: 2381
   service:
+    enabled: true
     type: ClusterIP
     ports:
       client: 2379
       peer: 2380
       metrics: 2381
+    labels: {}
+    annotations: {}
 
 apiserver:
+  enabled: true
   image:
     repository: k8s.gcr.io/kube-apiserver
     tag: v1.18.6
@@ -57,7 +74,20 @@ apiserver:
     ipAddresses: []
 
   serviceClusterIPRange: 10.96.0.0/12
+
   extraArgs: {}
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+  sidecars: []
+  extraVolumes: []
+  extraVolumeMounts: []
+
 
   port: 6443
   service:
@@ -66,9 +96,11 @@ apiserver:
     port: 6443
     # Specify nodePort for apiserver service (30000-32767)
     nodePort:
+    labels: {}
     annotations: {}
 
 controllerManager:
+  enabled: true
   image:
     repository: k8s.gcr.io/kube-controller-manager
     tag: v1.18.6
@@ -82,15 +114,30 @@ controllerManager:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+
   extraArgs: {}
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+  sidecars: []
+  extraVolumes: []
+  extraVolumeMounts: []
 
   port: 10257
   service:
     enabled: true
     type: ClusterIP
     port: 10257
+    labels: {}
+    annotations: {}
 
 scheduler:
+  enabled: true
   image:
     repository: k8s.gcr.io/kube-scheduler
     tag: v1.18.6
@@ -104,15 +151,30 @@ scheduler:
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
+
   extraArgs: {}
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+  sidecars: []
+  extraVolumes: []
+  extraVolumeMounts: []
 
   port: 10259
   service:
     enabled: true
     type: ClusterIP
     port: 10259
+    labels: {}
+    annotations: {}
 
 admin:
+  enabled: true
   image:
     repository: docker.io/kvaps/kubernetes-tools
     tag: v0.0.1
@@ -127,7 +189,28 @@ admin:
     #   cpu: 100m
     #   memory: 128Mi
 
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+  sidecars: []
+  extraVolumes: []
+  extraVolumeMounts: []
+
   job:
+    enabled: true
     schedule: "0 0 1 */6 *"
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 3
+    labels: {}
+    annotations: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    extraEnv: []

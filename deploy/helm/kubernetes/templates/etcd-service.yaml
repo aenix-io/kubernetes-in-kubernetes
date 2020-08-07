@@ -1,4 +1,4 @@
-{{- if not .Values.genCa }}
+{{- if and .Values.etcd.enabled .Values.etcd.service.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: v1
@@ -7,6 +7,13 @@ metadata:
   name: {{ $fullName }}-etcd
   labels:
     app: {{ $fullName }}-etcd
+    {{- with .Values.etcd.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.etcd.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.etcd.service.type }}
   publishNotReadyAddresses: true

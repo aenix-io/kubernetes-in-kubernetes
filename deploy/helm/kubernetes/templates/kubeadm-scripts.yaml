@@ -1,3 +1,4 @@
+{{- if .Values.admin.job.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: v1
@@ -7,3 +8,4 @@ metadata:
 data:
   configure-cluster.sh: |+
     {{- .Files.Get "scripts/configure-cluster.sh" | nindent 4 }}
+{{- end }}

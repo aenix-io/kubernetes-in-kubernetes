@@ -1,3 +1,4 @@
+{{- if .Values.admin.job.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: batch/v1beta1
@@ -6,6 +7,13 @@ metadata:
   name: "{{ $fullName }}-kubeadm-tasks"
   labels:
     app: "{{ $fullName }}-kubeadm-tasks"
+    {{- with .Values.admin.job.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.admin.job.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   schedule: "{{ .Values.admin.job.schedule }}"
   successfulJobsHistoryLimit: {{ .Values.admin.job.successfulJobsHistoryLimit }}
@@ -14,9 +22,16 @@ spec:
     metadata:
       labels:
         app: "{{ $fullName }}-kubeadm-tasks"
+        {{- with .Values.admin.job.labels }}
+        {{- toYaml . | nindent 4 }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/kubeadm-config.yaml") . | sha256sum }}
         checksum/scripts: {{ include (print $.Template.BasePath "/kubeadm-scripts.yaml") . | sha256sum }}
+        {{- with .Values.admin.job.annotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       template:
         {{- (include (print $.Template.BasePath "/kubeadm-job.yaml") . | fromYaml ).spec.template | toYaml | nindent 8 }}
+{{- end }}

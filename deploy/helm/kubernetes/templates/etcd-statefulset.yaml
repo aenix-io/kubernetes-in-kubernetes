@@ -1,4 +1,4 @@
-{{- if not .Values.genCa }}
+{{- if .Values.etcd.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: apps/v1
@@ -7,6 +7,13 @@ metadata:
   name: {{ $fullName }}-etcd
   labels:
     app: {{ $fullName }}-etcd
+    {{- with .Values.etcd.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.etcd.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.etcd.replicaCount }}
   serviceName: {{ $fullName }}-etcd
@@ -19,7 +26,27 @@ spec:
       name: {{ $fullName }}-etcd
       labels:
         app: {{ $fullName }}-etcd
+        {{- with .Values.etcd.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.etcd.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
+      {{- with .Values.etcd.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.etcd.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.etcd.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
       {{- with .Values.etcd.image.PullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
@@ -55,6 +82,9 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        {{- with .Values.etcd.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         image: {{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag }}
         ports:
         - containerPort: {{ .Values.etcd.ports.client }}
@@ -84,6 +114,12 @@ spec:
           name: pki-etcd-certs-server
         - mountPath: /var/lib/etcd
           name: etcd-data
+        {{- with .Values.etcd.extraVolumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.etcd.sidecars }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       volumes:
       - secret:
           secretName: {{ $fullName }}-pki-etcd-ca
@@ -97,6 +133,9 @@ spec:
       {{- if not .Values.persistence.enabled }}
       - emptyDir: {}
         name: etcd-data
+      {{- end }}
+      {{- with .Values.etcd.extraVolumes }}
+      {{- toYaml . | nindent 6 }}
       {{- end }}
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:

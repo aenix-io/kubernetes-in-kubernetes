@@ -1,3 +1,4 @@
+{{- if .Values.etcd.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: cert-manager.io/v1alpha2
@@ -136,3 +137,4 @@ spec:
   issuerRef:
     name: "{{ $fullName }}-etcd-issuer"
     kind: Issuer
+{{- end }}

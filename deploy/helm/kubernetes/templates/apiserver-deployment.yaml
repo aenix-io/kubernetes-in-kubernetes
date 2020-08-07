@@ -1,3 +1,4 @@
+{{- if .Values.apiserver.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: apps/v1
@@ -6,6 +7,13 @@ metadata:
   name: "{{ $fullName }}-apiserver"
   labels:
     app: "{{ $fullName }}-apiserver"
+    {{- with .Values.apiserver.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.apiserver.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.apiserver.replicaCount }}
   selector:
@@ -15,7 +23,26 @@ spec:
     metadata:
       labels:
         app: "{{ $fullName }}-apiserver"
+        {{- with .Values.apiserver.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.apiserver.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
+      {{- with .Values.apiserver.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.apiserver.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.apiserver.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.apiserver.image.PullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
@@ -69,6 +96,10 @@ spec:
         name: kube-apiserver
         resources:
           {{- toYaml .Values.apiserver.resources | nindent 10 }}
+        {{- with .Values.apiserver.extraEnv }}
+        env:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         volumeMounts:
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client
@@ -80,6 +111,12 @@ spec:
           name: pki-apiserver-kubelet-client
         - mountPath: /pki/sa
           name: pki-sa
+        {{- with .Values.apiserver.extraVolumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.apiserver.sidecars }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       volumes:
       - secret:
           secretName: "{{ $fullName }}-pki-front-proxy-client"
@@ -99,3 +136,7 @@ spec:
       - secret:
           secretName: "{{ $fullName }}-pki-sa"
         name: pki-sa
+      {{- with .Values.apiserver.extraVolumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

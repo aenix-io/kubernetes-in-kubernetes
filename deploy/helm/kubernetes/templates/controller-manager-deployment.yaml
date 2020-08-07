@@ -1,3 +1,4 @@
+{{- if .Values.controllerManager.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: apps/v1
@@ -6,6 +7,13 @@ metadata:
   name: "{{ $fullName }}-controller-manager"
   labels:
     app: "{{ $fullName }}-controller-manager"
+    {{- with .Values.controllerManager.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.controllerManager.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.controllerManager.replicaCount }}
   selector:
@@ -15,7 +23,26 @@ spec:
     metadata:
       labels:
         app: "{{ $fullName }}-controller-manager"
+        {{- with .Values.controllerManager.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.controllerManager.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
+      {{- with .Values.controllerManager.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.controllerManager.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.controllerManager.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.controllerManager.image.PullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
@@ -55,6 +82,10 @@ spec:
         name: kube-controller-manager
         resources:
           {{- toYaml .Values.controllerManager.resources | nindent 10 }}
+        {{- with .Values.controllerManager.extraEnv }}
+        env:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         volumeMounts:
         - mountPath: /etc/kubernetes/
           name: kubeconfig
@@ -65,6 +96,12 @@ spec:
           name: pki-front-proxy-client
         - mountPath: /pki/kubernetes-sa
           name: pki-sa
+        {{- with .Values.controllerManager.extraVolumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.controllerManager.sidecars }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       volumes:
       - secret:
           secretName: "{{ $fullName }}-controller-manager-conf"
@@ -78,3 +115,7 @@ spec:
       - secret:
           secretName: "{{ $fullName }}-pki-sa"
         name: pki-sa
+      {{- with .Values.controllerManager.extraVolumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}
