@@ -60,7 +60,7 @@ spec:
         - --etcd-cafile=/pki/apiserver-etcd-client/ca.crt
         - --etcd-certfile=/pki/apiserver-etcd-client/tls.crt
         - --etcd-keyfile=/pki/apiserver-etcd-client/tls.key
-        - --etcd-servers={{ template "kubernetes.etcdServers4ApiServer" . }}
+        - --etcd-servers={{ template "kubernetes.etcdEndpoints" . }}
         - --insecure-port=0
         - --kubelet-client-certificate=/pki/apiserver-kubelet-client/tls.crt
         - --kubelet-client-key=/pki/apiserver-kubelet-client/tls.key

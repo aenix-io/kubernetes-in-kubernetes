@@ -60,7 +60,7 @@ spec:
         - --client-cert-auth=true
         - --data-dir=/var/lib/etcd
         - --initial-advertise-peer-urls=https://$(POD_NAME).{{ $fullName }}-etcd:{{ .Values.etcd.ports.peer }}
-        - --initial-cluster={{ template "kubernetes.etcdServers4InitialCluster" . }}
+        - --initial-cluster={{ template "kubernetes.etcdInitialCluster" . }}
         - --initial-cluster-state=new
         - --initial-cluster-token={{ $fullName }}-etcd
         - --key-file=/pki/etcd/server/tls.key
@@ -82,6 +82,16 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: ETCDCTL_API
+          value: "3"
+        - name: ETCDCTL_CACERT
+          value: /pki/etcd/peer/ca.crt
+        - name: ETCDCTL_CERT
+          value: /pki/etcd/peer/tls.crt
+        - name: ETCDCTL_KEY
+          value: /pki/etcd/peer/tls.key 
+        - name: ETCDCTL_ENDPOINTS
+          value: {{ template "kubernetes.etcdEndpoints" . }}
         {{- with .Values.etcd.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

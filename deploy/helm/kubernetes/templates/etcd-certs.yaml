@@ -63,6 +63,7 @@ spec:
   - "{{ $podName2 }}"
   - "{{ $podName3 }}"
   - "localhost"
+  ipAddresses:
   - "127.0.0.1"
   issuerRef:
     name: "{{ $fullName }}-etcd-issuer"
@@ -95,6 +96,7 @@ spec:
   - "{{ $svcClientName2 }}"
   - "{{ $svcClientName3 }}"
   - "localhost"
+  ipAddresses:
   - "127.0.0.1"
   issuerRef:
     name: "{{ $fullName }}-etcd-issuer"

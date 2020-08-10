@@ -22,7 +22,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{/*
 Generate etcd servers list.
 */}}
-{{- define "kubernetes.etcdServers4ApiServer" -}}
+{{- define "kubernetes.etcdEndpoints" -}}
   {{- $fullName := include "kubernetes.fullname" . -}}
   {{- range $etcdcount, $e := until (int .Values.etcd.replicaCount) -}}
     {{- printf "https://" -}}
@@ -34,7 +34,7 @@ Generate etcd servers list.
   {{- end -}}
 {{- end -}}
 
-{{- define "kubernetes.etcdServers4InitialCluster" -}}
+{{- define "kubernetes.etcdInitialCluster" -}}
   {{- $fullName := include "kubernetes.fullname" . -}}
   {{- range $etcdcount, $e := until (int .Values.etcd.replicaCount) -}}
     {{- printf "%s-etcd-%d=" $fullName $etcdcount -}}
