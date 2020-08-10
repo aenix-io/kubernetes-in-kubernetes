@@ -41,3 +41,12 @@ helm upgrade --install -n kubernetes foo kubernetes --wait
 helm -n kubernetes delete foo
 kubectl delete ns kubernetes
 ```
+
+## Usage
+
+Kubernetes-in-Kubernetes is just a control plane, in most cases it's useless without workers.  
+If you're looking for a real use case, check out the following projects that implement worker nodes management:
+
+* **[Kubefarm]** - Automated Kubernetes deployment and the PXE-bootable servers farm
+
+[kubefarm]: https://github.com/kvaps/kubefarm
