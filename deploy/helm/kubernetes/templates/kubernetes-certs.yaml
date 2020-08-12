@@ -63,6 +63,7 @@ spec:
   {{- end }}
   ipAddresses:
   - "127.0.0.1"
+  - "10.96.0.1"
   {{- with .Values.apiserver.certSANs.ipAddresses }}
   {{- . | toYaml | nindent 2 }}
   {{- end }}

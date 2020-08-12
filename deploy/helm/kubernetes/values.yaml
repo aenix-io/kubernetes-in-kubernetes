@@ -27,6 +27,7 @@ etcd:
     #   memory: 128Mi
 
   extraArgs: {}
+    #advertise-address: 10.9.8.10
   labels: {}
   annotations: {}
   podLabels: {}
