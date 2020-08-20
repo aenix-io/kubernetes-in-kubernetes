@@ -7,5 +7,5 @@ metadata:
   name: {{ $fullName }}-kubeadm-scripts
 data:
   configure-cluster.sh: |+
-    {{- .Files.Get "scripts/configure-cluster.sh" | nindent 4 }}
+    {{- tpl (.Files.Get "scripts/configure-cluster.sh") . | nindent 4 }}
 {{- end }}

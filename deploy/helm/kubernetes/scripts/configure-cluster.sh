@@ -31,26 +31,37 @@ imageRepository: k8s.gcr.io
 controlPlaneEndpoint: "${FULL_NAME}-apiserver:6443"
 EOT
 
+{{- if .Values.apiserver.enabled }}{{"\n"}}
+# generate sa key
 if [ -z "$(kubectl get secret  "${FULL_NAME}-pki-sa" -o jsonpath='{.data}')" ]; then
   kubeadm init phase certs sa
   kubectl patch secret "${FULL_NAME}-pki-sa" --type merge \
     -p "{\"data\":{\"sa.pub\":\"$(base64 /etc/kubernetes/pki/sa.pub | tr -d '\n')\", \"sa.key\":\"$(base64 /etc/kubernetes/pki/sa.key | tr -d '\n')\" }}"
 fi
+{{- end }}
 
+# generate cluster-admin kubeconfig
 rm -f /etc/kubernetes/admin.conf
 kubeadm init phase kubeconfig admin --config kubeadmcfg.yaml
 kubectl patch secret "${FULL_NAME}-admin-conf" --type merge \
   -p "{\"data\":{\"admin.conf\":\"$(base64 /etc/kubernetes/admin.conf | tr -d '\n')\" }}"
 
+{{- if .Values.controllerManager.enabled }}{{"\n"}}
+# generate controller-manager kubeconfig
 rm -f /etc/kubernetes/controller-manager.conf
 kubeadm init phase kubeconfig controller-manager --config kubeadmcfg.yaml
 kubectl patch secret "${FULL_NAME}-controller-manager-conf" --type merge \
   -p "{\"data\":{\"controller-manager.conf\":\"$(base64 /etc/kubernetes/controller-manager.conf | tr -d '\n')\" }}"
+{{- end }}
 
+
+{{- if .Values.scheduler.enabled }}{{"\n"}}
+# generate scheduler kubeconfig
 rm -f /etc/kubernetes/scheduler.conf
 kubeadm init phase kubeconfig scheduler --config kubeadmcfg.yaml
 kubectl patch secret "${FULL_NAME}-scheduler-conf" --type merge \
   -p "{\"data\":{\"scheduler.conf\":\"$(base64 /etc/kubernetes/scheduler.conf | tr -d '\n')\" }}"
+{{- end }}
 
 # wait for cluster
 echo "Waiting for api-server endpoint ${FULL_NAME}-apiserver:6443..."
@@ -86,8 +97,18 @@ if [ -n "$CONTROL_PLANE_ENDPOINT" ]; then
   rm -rf "$tmp"
 fi
 
-# install cordns
+{{- if .Values.coredns.enabled }}{{"\n"}}
+# install coredns addon
 kubeadm init phase addon coredns --config /config/kubeadmcfg.yaml
+{{- else }}{{"\n"}}
+# uninstall coredns addon
+kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system delete configmap/coredns deployment/coredns 2>/dev/null || true
+{{- end }}
 
-# install kube-proxy
+{{- if .Values.kubeProxy.enabled }}{{"\n"}}
+# install kube-proxy addon
 kubeadm init phase addon kube-proxy --config /config/kubeadmcfg.yaml
+{{- else }}{{"\n"}}
+# uninstall kube-proxy addon
+kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system delete configmap/kube-proxy daemonset/kube-proxy 2>/dev/null || true
+{{- end }}
