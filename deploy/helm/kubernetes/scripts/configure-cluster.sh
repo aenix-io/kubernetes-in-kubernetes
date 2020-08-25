@@ -84,9 +84,7 @@ kubeadm init phase upload-config kubelet --config /config/kubeadmcfg.yaml -v1 2>
   | while read line; do echo "$line" | grep 'Preserving the CRISocket information for the control-plane node' && killall kubeadm || echo "$line"; done
 
 # setup bootstrap-tokens
-if ! kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-public get cm cluster-info >/dev/null 2>&1; then
-  kubeadm init phase bootstrap-token --config /config/kubeadmcfg.yaml --skip-token-print
-fi
+kubeadm init phase bootstrap-token --config /config/kubeadmcfg.yaml --skip-token-print
 
 # correct apiserver address for the external clients
 if [ -n "$CONTROL_PLANE_ENDPOINT" ]; then
