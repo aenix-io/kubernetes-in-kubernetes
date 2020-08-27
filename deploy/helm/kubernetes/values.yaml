@@ -54,6 +54,7 @@ etcd:
       metrics: 2381
     labels: {}
     annotations: {}
+    loadBalancerIP:
 
 apiServer:
   enabled: true
@@ -100,6 +101,7 @@ apiServer:
     nodePort:
     labels: {}
     annotations: {}
+    loadBalancerIP:
 
 controllerManager:
   enabled: true
@@ -137,6 +139,7 @@ controllerManager:
     port: 10257
     labels: {}
     annotations: {}
+    loadBalancerIP:
 
 scheduler:
   enabled: true
@@ -174,6 +177,7 @@ scheduler:
     port: 10259
     labels: {}
     annotations: {}
+    loadBalancerIP:
 
 admin:
   enabled: true

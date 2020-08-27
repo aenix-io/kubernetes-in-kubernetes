@@ -16,6 +16,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.etcd.service.type }}
+  {{- with .Values.etcd.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
   publishNotReadyAddresses: true
   clusterIP: None
   ports:

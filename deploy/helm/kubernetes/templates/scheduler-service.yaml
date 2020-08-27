@@ -16,6 +16,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.scheduler.service.type }}
+  {{- with .Values.scheduler.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
   ports:
   - port: {{ .Values.scheduler.service.port }}
     name: client

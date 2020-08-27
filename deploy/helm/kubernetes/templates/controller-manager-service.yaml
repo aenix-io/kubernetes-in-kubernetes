@@ -16,6 +16,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.controllerManager.service.type }}
+  {{- with .Values.controllerManager.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
   ports:
   - port: {{ .Values.controllerManager.service.port }}
     name: client

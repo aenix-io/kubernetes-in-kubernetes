@@ -16,6 +16,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.apiServer.service.type }}
+  {{- with .Values.apiServer.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
   ports:
   - port: {{ .Values.apiServer.service.port }}
     name: client
