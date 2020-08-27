@@ -26,6 +26,10 @@ etcd:
     #   cpu: 100m
     #   memory: 128Mi
 
+  certSANs:
+    dnsNames: []
+    ipAddresses: []
+
   extraArgs: {}
     # advertise-address is required for kube-proxy
     #advertise-address: 10.9.8.10

@@ -96,8 +96,19 @@ spec:
   - "{{ $svcClientName2 }}"
   - "{{ $svcClientName3 }}"
   - "localhost"
+  {{- with .Values.etcd.certSANs.dnsNames }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
   ipAddresses:
   - "127.0.0.1"
+  {{- with .Values.etcd.service.loadBalancerIP }}
+  {{- if not (has . $.Values.etcd.certSANs.ipAddresses) }}
+  - {{ . | quote }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.etcd.certSANs.ipAddresses }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
   issuerRef:
     name: "{{ $fullName }}-etcd-issuer"
     kind: Issuer

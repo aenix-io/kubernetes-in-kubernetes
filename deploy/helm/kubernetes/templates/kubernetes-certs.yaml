@@ -64,6 +64,11 @@ spec:
   ipAddresses:
   - "127.0.0.1"
   - "10.96.0.1"
+  {{- with .Values.apiServer.service.loadBalancerIP }}
+  {{- if not (has . $.Values.apiServer.certSANs.ipAddresses) }}
+  - {{ . | quote }}
+  {{- end }}
+  {{- end }}
   {{- with .Values.apiServer.certSANs.ipAddresses }}
   {{- . | toYaml | nindent 2 }}
   {{- end }}
