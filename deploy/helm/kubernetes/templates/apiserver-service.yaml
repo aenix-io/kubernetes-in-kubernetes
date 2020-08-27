@@ -1,4 +1,4 @@
-{{- if and .Values.apiserver.enabled .Values.apiserver.service.enabled }}
+{{- if and .Values.apiServer.enabled .Values.apiServer.service.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: v1
@@ -7,19 +7,19 @@ metadata:
   name: {{ $fullName }}-apiserver
   labels:
     app: {{ $fullName }}-apiserver
-    {{- with .Values.apiserver.service.labels }}
+    {{- with .Values.apiServer.service.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.apiserver.service.annotations }}
+  {{- with .Values.apiServer.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.apiserver.service.type }}
+  type: {{ .Values.apiServer.service.type }}
   ports:
-  - port: {{ .Values.apiserver.service.port }}
+  - port: {{ .Values.apiServer.service.port }}
     name: client
-    {{- with .Values.apiserver.service.nodePort }}
+    {{- with .Values.apiServer.service.nodePort }}
     nodePort: {{ . }}
     {{- end }}
   selector:

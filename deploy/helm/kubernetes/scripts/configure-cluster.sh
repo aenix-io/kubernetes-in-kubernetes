@@ -31,7 +31,7 @@ imageRepository: k8s.gcr.io
 controlPlaneEndpoint: "${FULL_NAME}-apiserver:6443"
 EOT
 
-{{- if .Values.apiserver.enabled }}{{"\n"}}
+{{- if .Values.apiServer.enabled }}{{"\n"}}
 # generate sa key
 if [ -z "$(kubectl get secret  "${FULL_NAME}-pki-sa" -o jsonpath='{.data}')" ]; then
   kubeadm init phase certs sa

@@ -1,4 +1,4 @@
-{{- if .Values.apiserver.enabled }}
+{{- if .Values.apiServer.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: apps/v1
@@ -7,15 +7,15 @@ metadata:
   name: "{{ $fullName }}-apiserver"
   labels:
     app: "{{ $fullName }}-apiserver"
-    {{- with .Values.apiserver.labels }}
+    {{- with .Values.apiServer.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-    {{- with .Values.apiserver.annotations }}
+    {{- with .Values.apiServer.annotations }}
     annotations:
       {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  replicas: {{ .Values.apiserver.replicaCount }}
+  replicas: {{ .Values.apiServer.replicaCount }}
   selector:
     matchLabels:
       app: "{{ $fullName }}-apiserver"
@@ -23,27 +23,27 @@ spec:
     metadata:
       labels:
         app: "{{ $fullName }}-apiserver"
-        {{- with .Values.apiserver.podLabels }}
+        {{- with .Values.apiServer.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.apiserver.podAnnotations }}
+      {{- with .Values.apiServer.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
-      {{- with .Values.apiserver.nodeSelector }}
+      {{- with .Values.apiServer.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.apiserver.tolerations }}
+      {{- with .Values.apiServer.tolerations }}
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      {{- with .Values.apiserver.affinity }}
+      {{- with .Values.apiServer.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.apiserver.image.PullSecrets }}
+      {{- with .Values.apiServer.image.PullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
@@ -72,31 +72,31 @@ spec:
         - --requestheader-extra-headers-prefix=X-Remote-Extra-
         - --requestheader-group-headers=X-Remote-Group
         - --requestheader-username-headers=X-Remote-User
-        - --secure-port={{ .Values.apiserver.port }}
+        - --secure-port={{ .Values.apiServer.port }}
         - --service-account-key-file=/pki/sa/sa.pub
-        - --service-cluster-ip-range={{ .Values.apiserver.serviceClusterIPRange }}
+        - --service-cluster-ip-range={{ .Values.apiServer.serviceClusterIPRange }}
         - --tls-cert-file=/pki/apiserver/tls.crt
         - --tls-private-key-file=/pki/apiserver/tls.key
-        {{- range $key, $value := .Values.apiserver.extraArgs }}
+        {{- range $key, $value := .Values.apiServer.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}
         ports:
-        - containerPort: {{ .Values.apiserver.port }}
+        - containerPort: {{ .Values.apiServer.port }}
           name: client
-        image: {{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag }}
-        imagePullPolicy: {{ .Values.apiserver.image.PullPolicy }}
+        image: {{ .Values.apiServer.image.repository }}:{{ .Values.apiServer.image.tag }}
+        imagePullPolicy: {{ .Values.apiServer.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
             path: /healthz
-            port: {{ .Values.apiserver.port }}
+            port: {{ .Values.apiServer.port }}
             scheme: HTTPS
           initialDelaySeconds: 15
           timeoutSeconds: 15
         name: kube-apiserver
         resources:
-          {{- toYaml .Values.apiserver.resources | nindent 10 }}
-        {{- with .Values.apiserver.extraEnv }}
+          {{- toYaml .Values.apiServer.resources | nindent 10 }}
+        {{- with .Values.apiServer.extraEnv }}
         env:
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -111,10 +111,10 @@ spec:
           name: pki-apiserver-kubelet-client
         - mountPath: /pki/sa
           name: pki-sa
-        {{- with .Values.apiserver.extraVolumeMounts }}
+        {{- with .Values.apiServer.extraVolumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.apiserver.sidecars }}
+      {{- with .Values.apiServer.sidecars }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
       volumes:
@@ -136,7 +136,7 @@ spec:
       - secret:
           secretName: "{{ $fullName }}-pki-sa"
         name: pki-sa
-      {{- with .Values.apiserver.extraVolumes }}
+      {{- with .Values.apiServer.extraVolumes }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
 {{- end }}

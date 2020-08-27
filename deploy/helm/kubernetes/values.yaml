@@ -55,7 +55,7 @@ etcd:
     labels: {}
     annotations: {}
 
-apiserver:
+apiServer:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-apiserver

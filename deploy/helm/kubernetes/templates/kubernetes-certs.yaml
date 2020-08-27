@@ -58,13 +58,13 @@ spec:
   - "{{ $podName2 }}"
   - "{{ $podName3 }}"
   - "localhost"
-  {{- with .Values.apiserver.certSANs.dnsNames }}
+  {{- with .Values.apiServer.certSANs.dnsNames }}
   {{- . | toYaml | nindent 2 }}
   {{- end }}
   ipAddresses:
   - "127.0.0.1"
   - "10.96.0.1"
-  {{- with .Values.apiserver.certSANs.ipAddresses }}
+  {{- with .Values.apiServer.certSANs.ipAddresses }}
   {{- . | toYaml | nindent 2 }}
   {{- end }}
   issuerRef:
