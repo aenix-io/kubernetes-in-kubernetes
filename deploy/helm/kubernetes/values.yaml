@@ -67,7 +67,7 @@ apiServer:
     tag: v1.19.0
     PullPolicy: IfNotPresent
     PullSecrets: []
-  replicaCount: 1
+  replicaCount: 2
   resources:
     requests:
       cpu: 100m
@@ -114,7 +114,7 @@ controllerManager:
     tag: v1.19.0
     PullPolicy: IfNotPresent
     PullSecrets: []
-  replicaCount: 1
+  replicaCount: 2
   resources:
     requests:
       cpu: 100m
@@ -152,7 +152,7 @@ scheduler:
     tag: v1.19.0
     PullPolicy: IfNotPresent
     PullSecrets: []
-  replicaCount: 1
+  replicaCount: 2
   resources:
     requests:
       cpu: 100m
