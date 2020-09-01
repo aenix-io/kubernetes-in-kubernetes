@@ -97,7 +97,7 @@ fi
 
 {{- if .Values.coredns.enabled }}{{"\n"}}
 # install coredns addon
-kubeadm init phase addon coredns --config /config/kubeadmcfg.yaml
+kubeadm init phase addon coredns --config /config/kubeadmcfg.yaml || true #TODO: workaround https://github.com/kubernetes/kubeadm/issues/2267
 {{- else }}{{"\n"}}
 # uninstall coredns addon
 kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system delete configmap/coredns deployment/coredns 2>/dev/null || true
