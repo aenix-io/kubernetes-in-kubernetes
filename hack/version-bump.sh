@@ -1,8 +1,8 @@
 #!/bin/sh
 EC=0
 
-version=$(git describe --tags --abbrev=0 | sed -n 's/^v//p')
-[ -z "$version" ] && echo "can not determine version from git" && exit 1
+version=$1
+[ -z "$version" ] && echo "version is not specified as first argument" && exit 1
 
 echo "bumping version to $version"
 
