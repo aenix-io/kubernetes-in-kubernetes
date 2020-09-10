@@ -8,7 +8,7 @@ Deploy Kubernetes in Kubernetes using Helm
 
 * Kubernetes v1.15+
 * Helm v3
-* cert-manager v0.14+
+* cert-manager v1.0.0+
 
 ## Quick Start
 
@@ -26,7 +26,7 @@ Deploy Kubernetes in Kubernetes using Helm
 
 ```bash
 helm repo add kvaps https://kvaps.github.io/charts
-helm install foo kvaps/kubernetes --version 0.4.0 \
+helm install foo kvaps/kubernetes --version 0.5.0 \
   --namespace foo \
   --create-namespace \
   --set persistence.storageClassName=local-path

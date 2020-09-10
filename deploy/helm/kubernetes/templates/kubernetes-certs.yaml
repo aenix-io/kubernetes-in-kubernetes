@@ -1,6 +1,6 @@
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-ca"
@@ -9,11 +9,11 @@ spec:
   secretName: "{{ $fullName }}-pki-ca"
   duration: 87600h # 3650d
   renewBefore: 8760h # 365d
-  organization:
-  - "{{ $fullName }}"
+  subject:
+    organizations:
+    - "{{ $fullName }}"
   usages:
   - "signing"
-  - "digital signature"
   - "key encipherment"
   - "cert sign"
   isCA: true
@@ -21,7 +21,7 @@ spec:
     name: "{{ $fullName }}-selfsigning-issuer"
     kind: Issuer
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: "{{ $fullName }}-issuer"
@@ -35,7 +35,7 @@ spec:
 {{- $podName1 := printf "*.%s-apiserver" $fullName }}
 {{- $podName2 := printf "*.%s-apiserver.%s" $fullName .Release.Namespace }}
 {{- $podName3 := printf "*.%s-apiserver.%s.svc" $fullName .Release.Namespace }}
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-apiserver"
@@ -44,8 +44,9 @@ spec:
   secretName: "{{ $fullName }}-pki-apiserver"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d
-  organization:
-  - "{{ $fullName }}"
+  subject:
+    organizations:
+    - "{{ $fullName }}"
   usages:
   - "signing"
   - "key encipherment"
@@ -76,7 +77,7 @@ spec:
     name: "{{ $fullName }}-issuer"
     kind: Issuer
 ---
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-apiserver-kubelet-client"
@@ -85,8 +86,9 @@ spec:
   secretName: "{{ $fullName }}-pki-apiserver-kubelet-client"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d
-  organization:
-  - "system:masters"
+  subject:
+    organizations:
+    - "system:masters"
   usages:
   - "signing"
   - "key encipherment"
