@@ -13,6 +13,9 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["secrets"]
+  verbs: ["create"]
+- apiGroups: [""]
+  resources: ["secrets"]
   verbs: ["get", "patch"]
   resourceNames:
   - "{{ $fullName }}-pki-sa"
