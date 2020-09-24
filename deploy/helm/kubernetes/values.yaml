@@ -99,7 +99,7 @@ apiServer:
   port: 6443
   service:
     enabled: true
-    type: NodePort
+    type: ClusterIP # NodePort / LoadBalancer
     port: 6443
     # Specify nodePort for apiserver service (30000-32767)
     nodePort:
