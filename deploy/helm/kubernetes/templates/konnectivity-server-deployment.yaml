@@ -1,0 +1,128 @@
+{{- if .Values.konnectivityServer.enabled }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ $fullName }}-konnectivity-server"
+  labels:
+    app: "{{ $fullName }}-konnectivity-server"
+    {{- with .Values.konnectivityServer.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.konnectivityServer.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.konnectivityServer.replicaCount }}
+  selector:
+    matchLabels:
+      app: "{{ $fullName }}-konnectivity-server"
+  template:
+    metadata:
+      labels:
+        app: "{{ $fullName }}-konnectivity-server"
+        {{- with .Values.konnectivityServer.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.konnectivityServer.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.konnectivityServer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.konnectivityServer.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.konnectivityServer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.konnectivityServer.image.PullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 10 }}
+      {{- end }}
+      automountServiceAccountToken: false
+      containers:
+      - command:
+        - /proxy-server
+        - --logtostderr=true
+        - --server-count={{ .Values.konnectivityServer.replicaCount }}
+        - --server-id=$(POD_NAME)
+        - --cluster-cert=/pki/apiserver/tls.crt
+        - --cluster-key=/pki/apiserver/tls.key
+        - --server-ca-cert=/pki/konnectivity-server/ca.crt
+        - --server-cert=/pki/konnectivity-server/tls.crt
+        - --server-key=/pki/konnectivity-server/tls.key
+        - --mode=http-connect
+        - --server-port={{ .Values.konnectivityServer.ports.server }}
+        - --agent-port={{ .Values.konnectivityServer.ports.agent }}
+        - --admin-port={{ .Values.konnectivityServer.ports.admin }}
+        - --agent-namespace=kube-system
+        - --agent-service-account=konnectivity-agent
+        - --kubeconfig=/etc/kubernetes/konnectivity-server.conf
+        - --authentication-audience=system:konnectivity-server
+        {{- range $key, $value := .Values.konnectivityServer.extraArgs }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.konnectivityServer.ports.server }}
+          name: server
+        - containerPort: {{ .Values.konnectivityServer.ports.agent }}
+          name: agent
+        - containerPort: {{ .Values.konnectivityServer.ports.admin }}
+          name: admin
+        image: {{ .Values.konnectivityServer.image.repository }}:{{ .Values.konnectivityServer.image.tag }}
+        imagePullPolicy: {{ .Values.konnectivityServer.image.PullPolicy }}
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /healthz
+            port: {{ .Values.konnectivityServer.ports.admin }}
+            scheme: HTTPS
+          initialDelaySeconds: 30
+          timeoutSeconds: 60
+        name: konnectivity-server
+        resources:
+          {{- toYaml .Values.konnectivityServer.resources | nindent 10 }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{- with .Values.konnectivityServer.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        volumeMounts:
+        - mountPath: /pki/apiserver
+          name: pki-apiserver
+        - mountPath: /pki/konnectivity-server
+          name: pki-konnectivity-server
+        - mountPath: /etc/kubernetes/
+          name: kubeconfig
+          readOnly: true
+        {{- with .Values.konnectivityServer.extraVolumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.konnectivityServer.sidecars }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      volumes:
+      - secret:
+          secretName: "{{ $fullName }}-pki-apiserver"
+        name: pki-apiserver
+      - secret:
+          secretName: "{{ $fullName }}-pki-konnectivity-server"
+        name: pki-konnectivity-server
+      - secret:
+          secretName: "{{ $fullName }}-konnectivity-server-conf"
+        name: kubeconfig
+      {{- with .Values.konnectivityServer.extraVolumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}

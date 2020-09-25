@@ -10,10 +10,13 @@ metadata:
     {{- with .Values.apiServer.service.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.apiServer.service.annotations }}
   annotations:
+    {{- if not (index .Values.apiServer.service.annotations "metallb.universe.tf/allow-shared-ip") }}
+    metallb.universe.tf/allow-shared-ip: {{ $fullName }}
+    {{- end }}
+    {{- with .Values.apiServer.service.annotations }}
     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- end }}
 spec:
   type: {{ .Values.apiServer.service.type }}
   {{- with .Values.apiServer.service.loadBalancerIP }}

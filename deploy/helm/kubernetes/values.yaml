@@ -230,3 +230,74 @@ kubeProxy:
 
 coredns:
   enabled: true
+
+konnectivityServer:
+  enabled: false
+  image:
+    repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-server
+    tag: v0.0.12
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  extraArgs: {}
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+  sidecars: []
+  extraVolumes: []
+  extraVolumeMounts: []
+
+  ports:
+    server: 8131
+    agent: 8132
+    admin: 8133
+  service:
+    enabled: true
+    type: ClusterIP
+    ports:
+      server: 8131
+      agent: 8132
+      admin: 8133
+    nodePorts:
+      server:
+      agent:
+      admin:
+    labels: {}
+    annotations: {}
+    loadBalancerIP:
+
+konnectivityAgent:
+  enabled: false
+  image:
+    repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-agent
+    tag: v0.0.12
+    PullPolicy: IfNotPresent
+    PullSecrets: []
+  replicaCount: 2
+  hostNetwork: true
+
+  extraArgs: {}
+  labels: {}
+  annotations: {}
+  podLabels: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+  sidecars: []
+  extraVolumes: []
+  extraVolumeMounts: []

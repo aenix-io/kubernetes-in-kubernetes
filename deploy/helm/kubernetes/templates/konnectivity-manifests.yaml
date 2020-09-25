@@ -1,0 +1,19 @@
+{{- if or .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-konnectivity-manifests
+data:
+  {{- if .Values.konnectivityServer.enabled }}
+  konnectivity-server-rbac.yaml: |
+    {{- tpl (.Files.Get "manifests/konnectivity-server-rbac.yaml") . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.konnectivityAgent.enabled }}
+  konnectivity-agent-deployment.yaml: |
+    {{- tpl (.Files.Get "manifests/konnectivity-agent-deployment.yaml") . | nindent 4 }}
+  konnectivity-agent-rbac.yaml: |
+    {{- tpl (.Files.Get "manifests/konnectivity-agent-rbac.yaml") . | nindent 4 }}
+  {{- end }}
+{{- end }}

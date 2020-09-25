@@ -26,10 +26,11 @@ spec:
         {{- with .Values.apiServer.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.apiServer.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/apiserver-config.yaml") . | sha256sum }}
+        {{- with .Values.apiServer.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
     spec:
       {{- with .Values.apiServer.nodeSelector }}
       nodeSelector:
@@ -77,6 +78,12 @@ spec:
         - --service-cluster-ip-range={{ .Values.apiServer.serviceClusterIPRange }}
         - --tls-cert-file=/pki/apiserver/tls.crt
         - --tls-private-key-file=/pki/apiserver/tls.key
+        - --egress-selector-config-file=/etc/kubernetes/egress-selector-configuration.yaml
+        {{- if .Values.konnectivityAgent.enabled }}{{"\n"}}
+        - --service-account-issuer=api
+        - --service-account-signing-key-file=/pki/sa/sa.key
+        - --api-audiences=system:konnectivity-server
+        {{- end }}
         {{- if not (hasKey .Values.apiServer.extraArgs "advertise-address") }}
         {{- with .Values.apiServer.service.loadBalancerIP }}
         - --advertise-address={{ . }}
@@ -106,6 +113,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         volumeMounts:
+        - mountPath: /etc/kubernetes
+          name: apiserver-config
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client
         - mountPath: /pki/apiserver
@@ -116,6 +125,10 @@ spec:
           name: pki-apiserver-kubelet-client
         - mountPath: /pki/sa
           name: pki-sa
+        {{- if .Values.konnectivityServer.enabled }}{{"\n"}}
+        - mountPath: /pki/konnectivity-client
+          name: pki-konnectivity-client
+        {{- end }}
         {{- with .Values.apiServer.extraVolumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -123,6 +136,9 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       volumes:
+      - configMap:
+          name: "{{ $fullName }}-apiserver-config"
+        name: apiserver-config
       - secret:
           secretName: "{{ $fullName }}-pki-front-proxy-client"
         name: pki-front-proxy-client
@@ -141,6 +157,11 @@ spec:
       - secret:
           secretName: "{{ $fullName }}-pki-sa"
         name: pki-sa
+      {{- if .Values.konnectivityServer.enabled }}{{"\n"}}
+      - secret:
+          secretName: "{{ $fullName }}-pki-konnectivity-client"
+        name: pki-konnectivity-client
+      {{- end }}
       {{- with .Values.apiServer.extraVolumes }}
       {{- toYaml . | nindent 6 }}
       {{- end }}

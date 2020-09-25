@@ -1,0 +1,31 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-apiserver-config
+data:
+  egress-selector-configuration.yaml: |
+    apiVersion: apiserver.k8s.io/v1beta1
+    kind: EgressSelectorConfiguration
+    egressSelections:
+    - name: cluster
+      connection:
+        {{- if and .Values.konnectivityServer.enabled }}
+        proxyProtocol: HTTPConnect
+        transport:
+          tcp:
+            url: "https://{{ $fullName }}-konnectivity-server:8131"
+            TLSConfig:
+              caBundle: /pki/konnectivity-client/ca.crt
+              clientKey: /pki/konnectivity-client/tls.key
+              clientCert: /pki/konnectivity-client/tls.crt
+        {{- else }}
+        proxyProtocol: Direct
+        {{- end }}
+    - name: master
+      connection:
+        proxyProtocol: Direct
+    - name: etcd
+      connection:
+        proxyProtocol: Direct

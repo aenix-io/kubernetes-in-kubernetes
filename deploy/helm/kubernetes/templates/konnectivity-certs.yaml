@@ -1,0 +1,88 @@
+{{- if and .Values.konnectivityServer.enabled }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-konnectivity-ca"
+spec:
+  commonName: "{{ $fullName }}-pki-konnectivity-ca"
+  secretName: "{{ $fullName }}-pki-konnectivity-ca"
+  duration: 87600h # 3650d
+  renewBefore: 8760h # 365d
+  subject:
+    organizations:
+    - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "cert sign"
+  isCA: true
+  issuerRef:
+    name: "{{ $fullName }}-selfsigning-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: "{{ $fullName }}-konnectivity-issuer"
+spec:
+  ca:
+    secretName: "{{ $fullName }}-pki-konnectivity-ca"
+---
+{{- $svcName1 := printf "%s-konnectivity-server" $fullName }}
+{{- $svcName2 := printf "%s-konnectivity-server.%s" $fullName .Release.Namespace }}
+{{- $svcName3 := printf "%s-konnectivity-server.%s.svc" $fullName .Release.Namespace }}
+{{- $podName1 := printf "*.%s-konnectivity-server" $fullName }}
+{{- $podName2 := printf "*.%s-konnectivity-server.%s" $fullName .Release.Namespace }}
+{{- $podName3 := printf "*.%s-konnectivity-server.%s.svc" $fullName .Release.Namespace }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-konnectivity-server"
+spec:
+  commonName: "{{ $fullName }}-pki-konnectivity-server"
+  secretName: "{{ $fullName }}-pki-konnectivity-server"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "server auth"
+  dnsNames:
+  - "{{ $svcName1 }}"
+  - "{{ $svcName2 }}"
+  - "{{ $svcName3 }}"
+  - "{{ $podName1 }}"
+  - "{{ $podName2 }}"
+  - "{{ $podName3 }}"
+  - "localhost"
+  ipAddresses:
+  - "127.0.0.1"
+  issuerRef:
+    name: "{{ $fullName }}-konnectivity-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-konnectivity-client"
+spec:
+  commonName: "{{ $fullName }}-pki-konnectivity-client"
+  secretName: "{{ $fullName }}-pki-konnectivity-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "system:masters"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  issuerRef:
+    name: "{{ $fullName }}-konnectivity-issuer"
+    kind: Issuer
+{{- end }}

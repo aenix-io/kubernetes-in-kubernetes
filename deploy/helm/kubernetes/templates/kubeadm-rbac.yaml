@@ -22,6 +22,7 @@ rules:
   - "{{ $fullName }}-admin-conf"
   - "{{ $fullName }}-controller-manager-conf"
   - "{{ $fullName }}-scheduler-conf"
+  - "{{ $fullName }}-konnectivity-server-conf"
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1

@@ -42,14 +42,14 @@ fi
 # generate cluster-admin kubeconfig
 rm -f /etc/kubernetes/admin.conf
 kubeadm init phase kubeconfig admin --config kubeadmcfg.yaml
-kubectl --kubeconfig=/etc/kubernetes/admin.conf config set clusters.kubernetes.server "https://${FULL_NAME}-apiserver:6443"
+kubectl --kubeconfig=/etc/kubernetes/admin.conf config set-cluster kubernetes --server "https://${FULL_NAME}-apiserver:6443"
 kubectl create secret generic "${FULL_NAME}-admin-conf" --from-file=/etc/kubernetes/admin.conf --dry-run=client -o yaml | kubectl apply -f -
 
 {{- if .Values.controllerManager.enabled }}{{"\n"}}
 # generate controller-manager kubeconfig
 rm -f /etc/kubernetes/controller-manager.conf
 kubeadm init phase kubeconfig controller-manager --config kubeadmcfg.yaml
-kubectl --kubeconfig=/etc/kubernetes/controller-manager.conf config set clusters.kubernetes.server "https://${FULL_NAME}-apiserver:6443"
+kubectl --kubeconfig=/etc/kubernetes/controller-manager.conf config set-cluster kubernetes --server "https://${FULL_NAME}-apiserver:6443"
 kubectl create secret generic "${FULL_NAME}-controller-manager-conf" --from-file=/etc/kubernetes/controller-manager.conf --dry-run=client -o yaml | kubectl apply -f -
 {{- end }}
 
@@ -57,8 +57,19 @@ kubectl create secret generic "${FULL_NAME}-controller-manager-conf" --from-file
 # generate scheduler kubeconfig
 rm -f /etc/kubernetes/scheduler.conf
 kubeadm init phase kubeconfig scheduler --config kubeadmcfg.yaml
-kubectl --kubeconfig=/etc/kubernetes/scheduler.conf config set clusters.kubernetes.server "https://${FULL_NAME}-apiserver:6443"
+kubectl --kubeconfig=/etc/kubernetes/scheduler.conf config set-cluster kubernetes --server "https://${FULL_NAME}-apiserver:6443"
 kubectl create secret generic "${FULL_NAME}-scheduler-conf" --from-file=/etc/kubernetes/scheduler.conf --dry-run=client -o yaml | kubectl apply -f -
+{{- end }}
+
+{{- if .Values.konnectivityServer.enabled }}{{"\n"}}
+# generate konnectivity-server kubeconfig
+openssl req -subj "/CN=system:konnectivity-server" -new -newkey rsa:2048 -nodes -out konnectivity.csr -keyout konnectivity.key -out konnectivity.csr
+openssl x509 -req -in konnectivity.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out konnectivity.crt -days 375 -sha256
+kubectl --kubeconfig /etc/kubernetes/konnectivity-server.conf config set-credentials system:konnectivity-server --client-certificate konnectivity.crt --client-key konnectivity.key --embed-certs=true
+kubectl --kubeconfig /etc/kubernetes/konnectivity-server.conf config set-cluster kubernetes --server "https://${FULL_NAME}-apiserver:6443" --certificate-authority /etc/kubernetes/pki/ca.crt --embed-certs=true
+kubectl --kubeconfig /etc/kubernetes/konnectivity-server.conf config set-context system:konnectivity-server@kubernetes --cluster kubernetes --user system:konnectivity-server
+kubectl --kubeconfig /etc/kubernetes/konnectivity-server.conf config use-context system:konnectivity-server@kubernetes
+kubectl create secret generic "${FULL_NAME}-konnectivity-server-conf" --from-file=/etc/kubernetes/konnectivity-server.conf --dry-run=client -o yaml | kubectl apply -f -
 {{- end }}
 
 # wait for cluster
@@ -90,6 +101,21 @@ kubectl --kubeconfig "$tmp/kubeconfig" config set clusters..server "https://${CO
 kubectl --kubeconfig "$tmp/kubeconfig" config set clusters..certificate-authority-data "$(base64 /etc/kubernetes/pki/ca.crt | tr -d '\n')"
 kubectl create configmap cluster-info --from-file="$tmp/kubeconfig" --dry-run=client -o yaml | kubectl --kubeconfig /etc/kubernetes/admin.conf apply -n kube-public -f -
 rm -rf "$tmp"
+
+{{- if .Values.konnectivityServer.enabled }}{{"\n"}}
+# install konnectivity server
+kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /manifests/konnectivity-server-rbac.yaml
+{{- else }}{{"\n"}}
+kubectl --kubeconfig /etc/kubernetes/admin.conf delete clusterrolebinding/system:konnectivity-server 2>/dev/null || true
+{{- end }}
+
+{{- if .Values.konnectivityAgent.enabled }}{{"\n"}}
+# install konnectivity agent
+kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /manifests/konnectivity-agent-deployment.yaml -f /manifests/konnectivity-agent-rbac.yaml
+{{- else }}{{"\n"}}
+# uninstall konnectivity agent
+kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system delete deployment/konnectivity-agent serviceaccount/konnectivity-agent 2>/dev/null || true
+{{- end }}
 
 {{- if .Values.coredns.enabled }}{{"\n"}}
 # install coredns addon

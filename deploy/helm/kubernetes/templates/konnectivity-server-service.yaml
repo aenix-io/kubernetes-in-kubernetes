@@ -1,0 +1,43 @@
+{{- if and .Values.konnectivityServer.enabled .Values.konnectivityServer.service.enabled }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-konnectivity-server
+  labels:
+    app: {{ $fullName }}-konnectivity-server
+    {{- with .Values.konnectivityServer.service.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if not (index .Values.konnectivityServer.service.annotations "metallb.universe.tf/allow-shared-ip") }}
+    metallb.universe.tf/allow-shared-ip: {{ $fullName }}
+    {{- end }}
+    {{- with .Values.konnectivityServer.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.konnectivityServer.service.type }}
+  {{- with .Values.konnectivityServer.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  ports:
+  - port: {{ .Values.konnectivityServer.ports.server }}
+    name: server
+    {{- with .Values.konnectivityServer.service.nodePorts.server }}
+    nodePort: {{ . }}
+    {{- end }}
+  - port: {{ .Values.konnectivityServer.ports.agent }}
+    name: agent
+    {{- with .Values.konnectivityServer.service.nodePorts.client }}
+    nodePort: {{ . }}
+    {{- end }}
+  - port: {{ .Values.konnectivityServer.ports.admin }}
+    name: admin
+    {{- with .Values.konnectivityServer.service.nodePorts.admin }}
+    nodePort: {{ . }}
+    {{- end }}
+  selector:
+    app: {{ $fullName }}-konnectivity-server
+{{- end }}

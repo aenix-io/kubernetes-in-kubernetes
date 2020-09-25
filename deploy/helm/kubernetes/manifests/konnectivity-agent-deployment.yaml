@@ -1,0 +1,101 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+    k8s-app: konnectivity-agent
+    {{- with .Values.konnectivityAgent.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- with .Values.konnectivityAgent.annotations }}
+    annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  namespace: kube-system
+  name: konnectivity-agent
+spec:
+  replicas: {{ .Values.konnectivityAgent.replicaCount }}
+  selector:
+    matchLabels:
+      k8s-app: konnectivity-agent
+  template:
+    metadata:
+      labels:
+        k8s-app: konnectivity-agent
+        {{- with .Values.konnectivityAgent.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.konnectivityAgent.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.konnectivityAgent.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: {{ .Values.konnectivityAgent.hostNetwork }}
+      priorityClassName: system-cluster-critical
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+      {{- with .Values.konnectivityAgent.tolerations }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      containers:
+      - image: {{ .Values.konnectivityAgent.image.repository }}:{{ .Values.konnectivityAgent.image.tag }}
+        name: konnectivity-agent
+        command: ["/proxy-agent"]
+        args:
+        - --logtostderr=true
+        - --ca-cert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - --service-account-token-path=/var/run/secrets/tokens/konnectivity-agent-token
+
+        {{- if not (hasKey .Values.konnectivityAgent.extraArgs "proxy-server-host") }}
+        {{- if .Values.konnectivityServer.service.loadBalancerIP }}
+        - --proxy-server-host={{ .Values.konnectivityServer.service.loadBalancerIP }}
+        {{- else }}
+        {{- fail ".konnectivityAgent.extraArgs.proxy-server-host must be specified!" }}
+        {{- end }}
+        {{- end }}
+
+        {{- if not (hasKey .Values.konnectivityAgent.extraArgs "roxy-server-port") }}
+        {{- if eq .Values.konnectivityServer.service.type "LoadBalancer" }}
+        - --proxy-server-port={{ .Values.konnectivityServer.service.ports.agent }}
+        {{- else if .Values.konnectivityServer.service.NodePort }}
+        - --proxy-server-port={{ .Values.konnectivityServer.service.nodePorts.agent }}
+        {{- else }}
+        {{- fail ".konnectivityAgent.extraArgs.proxy-server-port must be specified!" }}
+        {{- end }}
+        {{- end }}
+
+        {{- range $key, $value := .Values.konnectivityAgent.extraArgs }}
+        - --{{ $key }}={{ $value }}
+        {{- end }}
+        volumeMounts:
+        - mountPath: /var/run/secrets/tokens
+          name: konnectivity-agent-token
+        {{- with .Values.konnectivityAgent.extraVolumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            port: 8093
+            path: /healthz
+          initialDelaySeconds: 15
+          timeoutSeconds: 15
+      {{- with .Values.konnectivityAgent.sidecars }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      serviceAccountName: konnectivity-agent
+      volumes:
+      - name: konnectivity-agent-token
+        projected:
+          sources:
+          - serviceAccountToken:
+              path: konnectivity-agent-token
+              audience: system:konnectivity-server
+      {{- with .Values.konnectivityAgent.extraVolumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
