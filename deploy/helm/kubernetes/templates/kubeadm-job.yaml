@@ -79,7 +79,7 @@ spec:
           name: pki-front-proxy-ca
         - mountPath: /scripts
           name: scripts
-        {{- if or .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+        {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
         - mountPath: /manifests
           name: manifests
         {{- end }}
@@ -108,10 +108,14 @@ spec:
         configMap:
           name: "{{ $fullName }}-kubeadm-scripts"
           defaultMode: 0777
-      {{- if or .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+      {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
       - name: manifests
         projected:
           sources:
+          {{- if or .Values.extraManifests }}
+          - secret:
+              name: "{{ $fullName }}-extra-manifests"
+          {{- end }}
           {{- if or .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
           - configMap:
               name: "{{ $fullName }}-konnectivity-manifests"

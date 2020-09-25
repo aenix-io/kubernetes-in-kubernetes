@@ -301,3 +301,11 @@ konnectivityAgent:
   sidecars: []
   extraVolumes: []
   extraVolumeMounts: []
+
+# these manifests will be applied inside the cluster
+extraManifests: {}
+  #namespace.yaml:
+  #  apiVersion: v1
+  #  kind: Namespace
+  #  metadata:
+  #    name: example

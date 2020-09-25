@@ -132,3 +132,7 @@ kubeadm init phase addon kube-proxy --config /config/kubeadmcfg.yaml
 # uninstall kube-proxy addon
 kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system delete configmap/kube-proxy daemonset/kube-proxy 2>/dev/null || true
 {{- end }}
+
+{{- with .Values.extraManifests }}{{"\n"}}
+kubectl apply{{- range $key, $value := . }} -f /manifests/{{ $key }}{{- end }}
+{{- end }}

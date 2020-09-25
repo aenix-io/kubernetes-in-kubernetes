@@ -1,0 +1,16 @@
+{{- $fullName := include "kubernetes.fullname" . -}}
+{{- with .Values.extraManifests }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $fullName }}-extra-manifests
+data:
+  {{- range $key, $value := . }}
+  {{- if eq (printf "%T" $value) "string" }}
+  {{ $key }}: {{ $value | b64enc }}
+  {{- else }}
+  {{ $key }}: {{ printf "%s\n" (toYaml $value) | b64enc }}
+  {{- end }}
+  {{- end }}
+{{- end }}
