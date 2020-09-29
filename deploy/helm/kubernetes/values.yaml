@@ -264,6 +264,7 @@ konnectivityServer:
     server: 8131
     agent: 8132
     admin: 8133
+    health: 8134
   service:
     enabled: true
     type: ClusterIP
@@ -301,6 +302,10 @@ konnectivityAgent:
   sidecars: []
   extraVolumes: []
   extraVolumeMounts: []
+
+  ports:
+    admin: 8133
+    health: 8134
 
 # these manifests will be applied inside the cluster
 extraManifests: {}

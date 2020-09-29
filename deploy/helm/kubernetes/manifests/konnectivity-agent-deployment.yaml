@@ -60,7 +60,7 @@ spec:
         {{- end }}
         {{- end }}
 
-        {{- if not (hasKey .Values.konnectivityAgent.extraArgs "roxy-server-port") }}
+        {{- if not (hasKey .Values.konnectivityAgent.extraArgs "proxy-server-port") }}
         {{- if eq .Values.konnectivityServer.service.type "LoadBalancer" }}
         - --proxy-server-port={{ .Values.konnectivityServer.service.ports.agent }}
         {{- else if .Values.konnectivityServer.service.NodePort }}
@@ -70,9 +70,17 @@ spec:
         {{- end }}
         {{- end }}
 
+        - --admin-server-port={{ .Values.konnectivityAgent.ports.admin }}
+        - --health-server-port={{ .Values.konnectivityAgent.ports.health }}
+
         {{- range $key, $value := .Values.konnectivityAgent.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}
+        ports:
+        - containerPort: {{ .Values.konnectivityAgent.ports.admin }}
+          name: admin
+        - containerPort: {{ .Values.konnectivityAgent.ports.health }}
+          name: health
         volumeMounts:
         - mountPath: /var/run/secrets/tokens
           name: konnectivity-agent-token
@@ -81,8 +89,9 @@ spec:
         {{- end }}
         livenessProbe:
           httpGet:
-            port: 8093
             path: /healthz
+            port: {{ .Values.konnectivityAgent.ports.health }}
+            scheme: HTTP
           initialDelaySeconds: 15
           timeoutSeconds: 15
       {{- with .Values.konnectivityAgent.sidecars }}

@@ -63,6 +63,7 @@ spec:
         - --server-port={{ .Values.konnectivityServer.ports.server }}
         - --agent-port={{ .Values.konnectivityServer.ports.agent }}
         - --admin-port={{ .Values.konnectivityServer.ports.admin }}
+        - --health-port={{ .Values.konnectivityServer.ports.health }}
         - --agent-namespace=kube-system
         - --agent-service-account=konnectivity-agent
         - --kubeconfig=/etc/kubernetes/konnectivity-server.conf
@@ -77,14 +78,16 @@ spec:
           name: agent
         - containerPort: {{ .Values.konnectivityServer.ports.admin }}
           name: admin
+        - containerPort: {{ .Values.konnectivityServer.ports.health }}
+          name: health
         image: {{ .Values.konnectivityServer.image.repository }}:{{ .Values.konnectivityServer.image.tag }}
         imagePullPolicy: {{ .Values.konnectivityServer.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:
             path: /healthz
-            port: {{ .Values.konnectivityServer.ports.admin }}
-            scheme: HTTPS
+            port: {{ .Values.konnectivityServer.ports.health }}
+            scheme: HTTP
           initialDelaySeconds: 30
           timeoutSeconds: 60
         name: konnectivity-server

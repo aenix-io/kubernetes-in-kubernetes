@@ -33,11 +33,6 @@ spec:
     {{- with .Values.konnectivityServer.service.nodePorts.client }}
     nodePort: {{ . }}
     {{- end }}
-  - port: {{ .Values.konnectivityServer.ports.admin }}
-    name: admin
-    {{- with .Values.konnectivityServer.service.nodePorts.admin }}
-    nodePort: {{ . }}
-    {{- end }}
   selector:
     app: {{ $fullName }}-konnectivity-server
 {{- end }}
