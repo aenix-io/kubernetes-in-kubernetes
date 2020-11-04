@@ -5,7 +5,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-ca"
 spec:
-  commonName: "{{ $fullName }}-pki-ca"
+  commonName: "{{ $fullName }}-ca"
   secretName: "{{ $fullName }}-pki-ca"
   duration: 87600h # 3650d
   renewBefore: 8760h # 365d
@@ -40,7 +40,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-apiserver"
 spec:
-  commonName: "{{ $fullName }}-pki-apiserver"
+  commonName: "{{ $fullName }}-apiserver"
   secretName: "{{ $fullName }}-pki-apiserver"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d
@@ -82,7 +82,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-apiserver-kubelet-client"
 spec:
-  commonName: "{{ $fullName }}-pki-apiserver-kubelet-client"
+  commonName: "{{ $fullName }}-apiserver-kubelet-client"
   secretName: "{{ $fullName }}-pki-apiserver-kubelet-client"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d

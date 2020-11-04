@@ -6,7 +6,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-konnectivity-ca"
 spec:
-  commonName: "{{ $fullName }}-pki-konnectivity-ca"
+  commonName: "{{ $fullName }}-konnectivity-ca"
   secretName: "{{ $fullName }}-pki-konnectivity-ca"
   duration: 87600h # 3650d
   renewBefore: 8760h # 365d
@@ -41,7 +41,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-konnectivity-server"
 spec:
-  commonName: "{{ $fullName }}-pki-konnectivity-server"
+  commonName: "{{ $fullName }}-konnectivity-server"
   secretName: "{{ $fullName }}-pki-konnectivity-server"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d
@@ -71,7 +71,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-konnectivity-client"
 spec:
-  commonName: "{{ $fullName }}-pki-konnectivity-client"
+  commonName: "{{ $fullName }}-konnectivity-client"
   secretName: "{{ $fullName }}-pki-konnectivity-client"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d

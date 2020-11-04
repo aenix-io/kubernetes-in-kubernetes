@@ -6,7 +6,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-front-proxy-ca"
 spec:
-  commonName: "{{ $fullName }}-pki-front-proxy-ca"
+  commonName: "{{ $fullName }}-front-proxy-ca"
   secretName: "{{ $fullName }}-pki-front-proxy-ca"
   duration: 87600h # 3650d
   renewBefore: 8760h # 365d
@@ -35,7 +35,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-front-proxy-client"
 spec:
-  commonName: "{{ $fullName }}-pki-front-proxy-client"
+  commonName: "{{ $fullName }}-front-proxy-client"
   secretName: "{{ $fullName }}-pki-front-proxy-client"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d
