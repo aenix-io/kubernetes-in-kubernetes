@@ -15,7 +15,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default "kubernetes" .Values.nameOverride -}}
-{{- if or (contains $name .Release.Name) (eq (.Release.Name | upper) "RELEASE-NAME") -}}
+{{- if or (eq $name .Release.Name) (eq (.Release.Name | upper) "RELEASE-NAME") -}}
 {{- $name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
