@@ -24,6 +24,17 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default certificate name.
+*/}}
+{{- define "kubernetes.certname" -}}
+{{- if .Values.certnameOverride -}}
+{{- .Values.certnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- template "kubernetes.fullname" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Generate etcd servers list.
 */}}
 {{- define "kubernetes.etcdEndpoints" -}}
