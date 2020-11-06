@@ -1,12 +1,13 @@
 {{- if and .Values.konnectivityServer.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
+{{- $certName := include "kubernetes.certname" . -}}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-konnectivity-ca"
 spec:
-  commonName: "{{ $fullName }}-pki-konnectivity-ca"
+  commonName: "{{ $certName }}-konnectivity-ca"
   secretName: "{{ $fullName }}-pki-konnectivity-ca"
   duration: 87600h # 3650d
   renewBefore: 8760h # 365d
@@ -41,7 +42,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-konnectivity-server"
 spec:
-  commonName: "{{ $fullName }}-pki-konnectivity-server"
+  commonName: "{{ $certName }}-konnectivity-server"
   secretName: "{{ $fullName }}-pki-konnectivity-server"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d
@@ -71,7 +72,7 @@ kind: Certificate
 metadata:
   name: "{{ $fullName }}-pki-konnectivity-client"
 spec:
-  commonName: "{{ $fullName }}-pki-konnectivity-client"
+  commonName: "{{ $certName }}-konnectivity-client"
   secretName: "{{ $fullName }}-pki-konnectivity-client"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d

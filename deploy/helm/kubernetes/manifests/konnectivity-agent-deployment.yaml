@@ -44,10 +44,12 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       containers:
-      - image: {{ .Values.konnectivityAgent.image.repository }}:{{ .Values.konnectivityAgent.image.tag }}
-        name: konnectivity-agent
-        command: ["/proxy-agent"]
-        args:
+      - name: konnectivity-agent
+        {{- with .Values.konnectivityAgent.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
+        command:
+        - /proxy-agent
         - --logtostderr=true
         - --ca-cert=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - --service-account-token-path=/var/run/secrets/tokens/konnectivity-agent-token

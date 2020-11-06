@@ -69,7 +69,9 @@ spec:
         {{- range $key, $value := .Values.controllerManager.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}
-        image: {{ .Values.controllerManager.image.repository }}:{{ .Values.controllerManager.image.tag }}
+        {{- with .Values.controllerManager.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
         imagePullPolicy: {{ .Values.controllerManager.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8

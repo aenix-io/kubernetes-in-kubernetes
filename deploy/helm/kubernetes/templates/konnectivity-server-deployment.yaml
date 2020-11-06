@@ -80,7 +80,9 @@ spec:
           name: admin
         - containerPort: {{ .Values.konnectivityServer.ports.health }}
           name: health
-        image: {{ .Values.konnectivityServer.image.repository }}:{{ .Values.konnectivityServer.image.tag }}
+        {{- with .Values.konnectivityServer.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
         imagePullPolicy: {{ .Values.konnectivityServer.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8

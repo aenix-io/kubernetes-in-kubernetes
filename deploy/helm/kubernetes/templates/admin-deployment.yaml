@@ -51,7 +51,9 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - command: [ 'sleep', 'infinity' ]
-        image: {{ .Values.admin.image.repository }}:{{ .Values.admin.image.tag }}
+        {{- with .Values.admin.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
         imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         name: admin
         livenessProbe:
