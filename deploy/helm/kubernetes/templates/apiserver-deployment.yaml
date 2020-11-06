@@ -68,7 +68,7 @@ spec:
         - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
         - --proxy-client-cert-file=/pki/front-proxy-client/tls.crt
         - --proxy-client-key-file=/pki/front-proxy-client/tls.key
-        - --requestheader-allowed-names=front-proxy-client
+        - --requestheader-allowed-names={{ $fullName }}-pki-front-proxy-client
         - --requestheader-client-ca-file=/pki/front-proxy-client/ca.crt
         - --requestheader-extra-headers-prefix=X-Remote-Extra-
         - --requestheader-group-headers=X-Remote-Group
