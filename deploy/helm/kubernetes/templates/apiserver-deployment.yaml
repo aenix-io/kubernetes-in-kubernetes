@@ -96,7 +96,9 @@ spec:
         ports:
         - containerPort: {{ .Values.apiServer.port }}
           name: client
-        image: {{ .Values.apiServer.image.repository }}:{{ .Values.apiServer.image.tag }}
+        {{- with .Values.apiServer.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
         imagePullPolicy: {{ .Values.apiServer.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8

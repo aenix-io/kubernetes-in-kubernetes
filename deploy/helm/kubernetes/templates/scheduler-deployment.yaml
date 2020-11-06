@@ -60,7 +60,9 @@ spec:
         {{- range $key, $value := .Values.scheduler.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}
-        image: {{ .Values.scheduler.image.repository }}:{{ .Values.scheduler.image.tag }}
+        {{- with .Values.scheduler.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
         imagePullPolicy: {{ .Values.scheduler.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8

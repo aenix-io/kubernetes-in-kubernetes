@@ -95,7 +95,9 @@ spec:
         {{- with .Values.etcd.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        image: {{ .Values.etcd.image.repository }}:{{ .Values.etcd.image.tag }}
+        {{- with .Values.etcd.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
         ports:
         - containerPort: {{ .Values.etcd.ports.client }}
           name: client

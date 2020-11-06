@@ -51,7 +51,9 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: kubeadm
-        image: {{ .Values.admin.image.repository }}:{{ .Values.admin.image.tag }}
+        {{- with .Values.admin.image }}
+        image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        {{- end }}
         imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         command: [ '/scripts/configure-cluster.sh' ]
         env:
