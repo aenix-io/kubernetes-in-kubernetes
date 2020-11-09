@@ -47,7 +47,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
-      serviceAccountName: "{{ $fullName }}-kubeadm-tasks"
+      automountServiceAccountToken: false
       restartPolicy: OnFailure
       containers:
       - name: kubeadm
