@@ -57,6 +57,8 @@ spec:
         - --kubeconfig=/etc/kubernetes/scheduler.conf
         - --leader-elect=true
         - --secure-port={{ .Values.scheduler.port }}
+        - --tls-cert-file=/pki/scheduler-server/tls.crt
+        - --tls-private-key-file=/pki/scheduler-server/tls.key
         {{- range $key, $value := .Values.scheduler.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}

@@ -66,6 +66,8 @@ spec:
         - --secure-port={{ .Values.controllerManager.port }}
         - --service-account-private-key-file=/pki/kubernetes-sa/sa.key
         - --use-service-account-credentials=true
+        - --tls-cert-file=/pki/controller-manager-server/tls.crt
+        - --tls-private-key-file=/pki/controller-manager-server/tls.key
         {{- range $key, $value := .Values.controllerManager.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}
