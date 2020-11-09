@@ -9,7 +9,9 @@ data:
   kubeadmcfg.yaml: |+
     apiVersion: kubeadm.k8s.io/v1beta2
     kind: ClusterConfiguration
-    {{- with .Values.controlPlaneEndpoint }}
-    controlPlaneEndpoint: {{ . }}
+    {{- if .Values.controlPlaneEndpoint }}
+    controlPlaneEndpoint: {{ .Values.controlPlaneEndpoint }}
+    {{- else }}
+    controlPlaneEndpoint: {{ $fullName }}-apiserver:{{ .Values.apiServer.service.port }}
     {{- end }}
 {{- end }}

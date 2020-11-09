@@ -57,28 +57,17 @@ spec:
         imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         command: [ '/scripts/configure-cluster.sh' ]
         env:
-        - name: FULL_NAME
-          value: "{{ $fullName }}"
-        {{- with .Values.controlPlaneEndpoint }}
-        - name: CONTROL_PLANE_ENDPOINT
-          value: "{{ . }}"
-        {{- end }}
+        - name: KUBECONFIG
+          value: "/etc/kubernetes/admin.conf"
         {{- with .Values.admin.job.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         volumeMounts:
-        - mountPath: /pki/front-proxy-client
-          name: pki-front-proxy-client
-        - mountPath: /pki/apiserver
-          name: pki-apiserver
-        - mountPath: /pki/apiserver-etcd-client
-          name: pki-apiserver-etcd-client
-        - mountPath: /pki/apiserver-kubelet-client
-          name: pki-apiserver-kubelet-client
-        - mountPath: /pki/ca
-          name: pki-ca
-        - mountPath: /pki/front-proxy-ca
-          name: pki-front-proxy-ca
+        - mountPath: /etc/kubernetes/
+          name: kubeconfig
+          readOnly: true
+        - mountPath: /pki/admin-client
+          name: pki-admin-client
         - mountPath: /scripts
           name: scripts
         {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
@@ -87,25 +76,19 @@ spec:
         {{- end }}
         - mountPath: /config
           name: config
+        {{- with .Values.admin.extraVolumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.admin.sidecars }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       volumes:
+      - configMap:
+          name: "{{ $fullName }}-admin-conf"
+        name: kubeconfig
       - secret:
-          secretName: "{{ $fullName }}-pki-front-proxy-client"
-        name: pki-front-proxy-client
-      - secret:
-          secretName: "{{ $fullName }}-pki-apiserver-server"
-        name: pki-apiserver
-      - secret:
-          secretName: "{{ $fullName }}-pki-apiserver-etcd-client"
-        name: pki-apiserver-etcd-client
-      - secret:
-          secretName: "{{ $fullName }}-pki-apiserver-kubelet-client"
-        name: pki-apiserver-kubelet-client
-      - secret:
-          secretName: "{{ $fullName }}-pki-ca"
-        name: pki-ca
-      - secret:
-          secretName: "{{ $fullName }}-pki-front-proxy-ca"
-        name: pki-front-proxy-ca
+          secretName: "{{ $fullName }}-pki-admin-client"
+        name: pki-admin-client
       - name: scripts
         configMap:
           name: "{{ $fullName }}-kubeadm-scripts"
@@ -126,4 +109,7 @@ spec:
       - name: config
         configMap:
           name: "{{ $fullName }}-kubeadm-config"
+      {{- with .Values.admin.extraVolumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
 {{- end }}

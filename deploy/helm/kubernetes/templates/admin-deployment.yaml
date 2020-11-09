@@ -71,8 +71,6 @@ spec:
         env:
         - name: KUBECONFIG
           value: "/etc/kubernetes/admin.conf"
-        - name: FULL_NAME
-          value: "{{ $fullName }}"
         {{- with .Values.admin.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -82,6 +80,14 @@ spec:
           readOnly: true
         - mountPath: /pki/admin-client
           name: pki-admin-client
+        - mountPath: /scripts
+          name: scripts
+        {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+        - mountPath: /manifests
+          name: manifests
+        {{- end }}
+        - mountPath: /config
+          name: config
         {{- with .Values.admin.extraVolumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -95,6 +101,26 @@ spec:
       - secret:
           secretName: "{{ $fullName }}-pki-admin-client"
         name: pki-admin-client
+      - name: scripts
+        configMap:
+          name: "{{ $fullName }}-kubeadm-scripts"
+          defaultMode: 0777
+      {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+      - name: manifests
+        projected:
+          sources:
+          {{- if or .Values.extraManifests }}
+          - secret:
+              name: "{{ $fullName }}-extra-manifests"
+          {{- end }}
+          {{- if or .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+          - configMap:
+              name: "{{ $fullName }}-konnectivity-manifests"
+          {{- end }}
+      {{- end }}
+      - name: config
+        configMap:
+          name: "{{ $fullName }}-kubeadm-config"
       {{- with .Values.admin.extraVolumes }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
