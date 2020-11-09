@@ -199,6 +199,12 @@ admin:
     #   cpu: 100m
     #   memory: 128Mi
 
+  job:
+    enabled: true
+    schedule: "0 0 1 */6 *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+
   labels: {}
   annotations: {}
   podLabels: {}
@@ -210,20 +216,6 @@ admin:
   sidecars: []
   extraVolumes: []
   extraVolumeMounts: []
-
-  job:
-    enabled: true
-    schedule: "0 0 1 */6 *"
-    successfulJobsHistoryLimit: 3
-    failedJobsHistoryLimit: 3
-    labels: {}
-    annotations: {}
-    podLabels: {}
-    podAnnotations: {}
-    nodeSelector: {}
-    tolerations: []
-    affinity: {}
-    extraEnv: []
 
 kubeProxy:
   enabled: true

@@ -1,4 +1,4 @@
-{{- if .Values.admin.job.enabled }}
+{{- if or .Values.admin.enabled .Values.admin.job.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: v1

@@ -7,7 +7,7 @@ metadata:
   name: "{{ $fullName }}-kubeadm-tasks"
   labels:
     app: "{{ $fullName }}-kubeadm-tasks"
-    {{- with .Values.admin.job.labels }}
+    {{- with .Values.admin.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
@@ -15,7 +15,7 @@ metadata:
     helm.sh/hook-delete-policy: before-hook-creation
     checksum/config: {{ include (print $.Template.BasePath "/kubeadm-config.yaml") . | sha256sum }}
     checksum/scripts: {{ include (print $.Template.BasePath "/kubeadm-scripts.yaml") . | sha256sum }}
-    {{- with .Values.admin.job.annotations }}
+    {{- with .Values.admin.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
@@ -23,23 +23,23 @@ spec:
     metadata:
       labels:
         app: "{{ $fullName }}-kubeadm-tasks"
-        {{- with .Values.admin.job.podLabels }}
+        {{- with .Values.admin.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.admin.job.podAnnotations }}
+      {{- with .Values.admin.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
-      {{- with .Values.admin.job.nodeSelector }}
+      {{- with .Values.admin.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.admin.job.tolerations }}
+      {{- with .Values.admin.tolerations }}
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      {{- with .Values.admin.job.affinity }}
+      {{- with .Values.admin.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -59,7 +59,7 @@ spec:
         env:
         - name: KUBECONFIG
           value: "/etc/kubernetes/admin.conf"
-        {{- with .Values.admin.job.extraEnv }}
+        {{- with .Values.admin.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         volumeMounts:
