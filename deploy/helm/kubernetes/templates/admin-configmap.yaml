@@ -1,0 +1,30 @@
+{{- if .Values.admin.enabled }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-admin-conf
+data:
+  admin.conf: |
+    apiVersion: v1
+    clusters:
+    - cluster:
+        certificate-authority: /pki/admin-client/ca.crt
+        server: https://{{ $fullName }}-apiserver:{{ .Values.apiServer.service.port }}
+      name: default-cluster
+    contexts:
+    - context:
+        cluster: default-cluster
+        namespace: default
+        user: default-auth
+      name: default-context
+    current-context: default-context
+    kind: Config
+    preferences: {}
+    users:
+    - name: default-auth
+      user:
+        client-certificate: /pki/admin-client/tls.crt
+        client-key: /pki/admin-client/tls.key
+{{- end }}

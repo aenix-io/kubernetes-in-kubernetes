@@ -56,7 +56,7 @@ spec:
         - --allow-privileged=true
         - --authorization-mode=Node,RBAC
         - --bind-address=0.0.0.0
-        - --client-ca-file=/pki/apiserver/ca.crt
+        - --client-ca-file=/pki/apiserver-server/ca.crt
         - --enable-admission-plugins=NodeRestriction
         - --enable-bootstrap-token-auth=true
         - --etcd-cafile=/pki/apiserver-etcd-client/ca.crt
@@ -75,14 +75,14 @@ spec:
         - --requestheader-group-headers=X-Remote-Group
         - --requestheader-username-headers=X-Remote-User
         - --secure-port={{ .Values.apiServer.port }}
-        - --service-account-key-file=/pki/sa/sa.pub
+        - --service-account-key-file=/pki/sa/tls.crt
         - --service-cluster-ip-range={{ .Values.apiServer.serviceClusterIPRange }}
-        - --tls-cert-file=/pki/apiserver/tls.crt
-        - --tls-private-key-file=/pki/apiserver/tls.key
+        - --tls-cert-file=/pki/apiserver-server/tls.crt
+        - --tls-private-key-file=/pki/apiserver-server/tls.key
         - --egress-selector-config-file=/etc/kubernetes/egress-selector-configuration.yaml
         {{- if .Values.konnectivityAgent.enabled }}{{"\n"}}
         - --service-account-issuer=api
-        - --service-account-signing-key-file=/pki/sa/sa.key
+        - --service-account-signing-key-file=/pki/sa/tls.key
         - --api-audiences=system:konnectivity-server
         {{- end }}
         {{- if not (hasKey .Values.apiServer.extraArgs "advertise-address") }}
@@ -120,8 +120,8 @@ spec:
           name: apiserver-config
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client
-        - mountPath: /pki/apiserver
-          name: pki-apiserver
+        - mountPath: /pki/apiserver-server
+          name: pki-apiserver-server
         - mountPath: /pki/apiserver-etcd-client
           name: pki-apiserver-etcd-client
         - mountPath: /pki/apiserver-kubelet-client
@@ -146,17 +146,14 @@ spec:
           secretName: "{{ $fullName }}-pki-front-proxy-client"
         name: pki-front-proxy-client
       - secret:
-          secretName: "{{ $fullName }}-pki-apiserver"
-        name: pki-apiserver
+          secretName: "{{ $fullName }}-pki-apiserver-server"
+        name: pki-apiserver-server
       - secret:
           secretName: "{{ $fullName }}-pki-apiserver-etcd-client"
         name: pki-apiserver-etcd-client
       - secret:
           secretName: "{{ $fullName }}-pki-apiserver-kubelet-client"
         name: pki-apiserver-kubelet-client
-      - secret:
-          secretName: "{{ $fullName }}-pki-ca"
-        name: pki-ca
       - secret:
           secretName: "{{ $fullName }}-pki-sa"
         name: pki-sa

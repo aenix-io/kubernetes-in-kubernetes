@@ -108,6 +108,8 @@ spec:
           name: pki-apiserver
         - mountPath: /pki/konnectivity-server
           name: pki-konnectivity-server
+        - mountPath: /pki/konnectivity-server-client
+          name: pki-konnectivity-server-client
         - mountPath: /etc/kubernetes/
           name: kubeconfig
           readOnly: true
@@ -119,13 +121,16 @@ spec:
       {{- end }}
       volumes:
       - secret:
-          secretName: "{{ $fullName }}-pki-apiserver"
+          secretName: "{{ $fullName }}-pki-apiserver-server"
         name: pki-apiserver
       - secret:
           secretName: "{{ $fullName }}-pki-konnectivity-server"
         name: pki-konnectivity-server
       - secret:
-          secretName: "{{ $fullName }}-konnectivity-server-conf"
+          secretName: "{{ $fullName }}-pki-konnectivity-server-client"
+        name: pki-konnectivity-server-client
+      - configMap:
+          name: "{{ $fullName }}-konnectivity-server-conf"
         name: kubeconfig
       {{- with .Values.konnectivityServer.extraVolumes }}
       {{- toYaml . | nindent 6 }}

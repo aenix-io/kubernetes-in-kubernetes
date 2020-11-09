@@ -64,8 +64,10 @@ spec:
         - --requestheader-client-ca-file=/pki/front-proxy-client/tls.crt
         - --root-ca-file=/pki/ca/tls.crt
         - --secure-port={{ .Values.controllerManager.port }}
-        - --service-account-private-key-file=/pki/kubernetes-sa/sa.key
+        - --service-account-private-key-file=/pki/sa/tls.key
         - --use-service-account-credentials=true
+        - --tls-cert-file=/pki/controller-manager-server/tls.crt
+        - --tls-private-key-file=/pki/controller-manager-server/tls.key
         {{- range $key, $value := .Values.controllerManager.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}
@@ -92,11 +94,15 @@ spec:
         - mountPath: /etc/kubernetes/
           name: kubeconfig
           readOnly: true
+        - mountPath: /pki/controller-manager-server
+          name: pki-controller-manager-server
+        - mountPath: /pki/controller-manager-client
+          name: pki-controller-manager-client
         - mountPath: /pki/ca
           name: pki-ca
         - mountPath: /pki/front-proxy-client
           name: pki-front-proxy-client
-        - mountPath: /pki/kubernetes-sa
+        - mountPath: /pki/sa
           name: pki-sa
         {{- with .Values.controllerManager.extraVolumeMounts }}
         {{- toYaml . | nindent 8 }}
@@ -105,9 +111,15 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       volumes:
-      - secret:
-          secretName: "{{ $fullName }}-controller-manager-conf"
+      - configMap:
+          name: "{{ $fullName }}-controller-manager-conf"
         name: kubeconfig
+      - secret:
+          secretName: "{{ $fullName }}-pki-controller-manager-server"
+        name: pki-controller-manager-server
+      - secret:
+          secretName: "{{ $fullName }}-pki-controller-manager-client"
+        name: pki-controller-manager-client
       - secret:
           secretName: "{{ $fullName }}-pki-ca"
         name: pki-ca
