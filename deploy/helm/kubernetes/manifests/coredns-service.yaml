@@ -1,0 +1,33 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kube-dns
+  namespace: kube-system
+  resourceVersion: '0'
+  creationTimestamp: null
+  labels:
+    k8s-app: kube-dns
+    kubernetes.io/cluster-service: 'true'
+    kubernetes.io/name: KubeDNS
+  annotations:
+    prometheus.io/port: '9153'
+    prometheus.io/scrape: 'true'
+spec:
+  ports:
+    - name: dns
+      protocol: UDP
+      port: 53
+      targetPort: 53
+    - name: dns-tcp
+      protocol: TCP
+      port: 53
+      targetPort: 53
+    - name: metrics
+      protocol: TCP
+      port: 9153
+      targetPort: 9153
+  selector:
+    k8s-app: kube-dns
+  clusterIP: 10.96.0.10
+status:
+  loadBalancer: {}
