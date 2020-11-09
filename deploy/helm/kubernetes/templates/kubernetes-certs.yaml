@@ -30,19 +30,19 @@ spec:
   ca:
     secretName: "{{ $fullName }}-pki-ca"
 ---
-{{- $svcName1 := printf "%s-apiserver" $fullName }}
-{{- $svcName2 := printf "%s-apiserver.%s" $fullName .Release.Namespace }}
-{{- $svcName3 := printf "%s-apiserver.%s.svc" $fullName .Release.Namespace }}
-{{- $podName1 := printf "*.%s-apiserver" $fullName }}
-{{- $podName2 := printf "*.%s-apiserver.%s" $fullName .Release.Namespace }}
-{{- $podName3 := printf "*.%s-apiserver.%s.svc" $fullName .Release.Namespace }}
+{{- $svcName1 := printf "%s-controller-manager" $fullName }}
+{{- $svcName2 := printf "%s-controller-manager.%s" $fullName .Release.Namespace }}
+{{- $svcName3 := printf "%s-controller-manager.%s.svc" $fullName .Release.Namespace }}
+{{- $podName1 := printf "*.%s-controller-manager" $fullName }}
+{{- $podName2 := printf "*.%s-controller-manager.%s" $fullName .Release.Namespace }}
+{{- $podName3 := printf "*.%s-controller-manager.%s.svc" $fullName .Release.Namespace }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: "{{ $fullName }}-pki-apiserver"
+  name: "{{ $fullName }}-pki-controller-manager-server"
 spec:
-  commonName: "{{ $certName }}-apiserver"
-  secretName: "{{ $fullName }}-pki-apiserver"
+  commonName: "{{ $certName }}-controller-manager-server"
+  secretName: "{{ $fullName }}-pki-controller-manager-server"
   duration: 8760h # 365d
   renewBefore: 4380h # 178d
   subject:
@@ -74,6 +74,182 @@ spec:
   {{- with .Values.apiServer.certSANs.ipAddresses }}
   {{- . | toYaml | nindent 2 }}
   {{- end }}
+  issuerRef:
+    name: "{{ $fullName }}-issuer"
+    kind: Issuer
+---
+{{- $svcName1 := printf "%s-scheduler" $fullName }}
+{{- $svcName2 := printf "%s-scheduler.%s" $fullName .Release.Namespace }}
+{{- $svcName3 := printf "%s-scheduler.%s.svc" $fullName .Release.Namespace }}
+{{- $podName1 := printf "*.%s-scheduler" $fullName }}
+{{- $podName2 := printf "*.%s-scheduler.%s" $fullName .Release.Namespace }}
+{{- $podName3 := printf "*.%s-scheduler.%s.svc" $fullName .Release.Namespace }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-scheduler-server"
+spec:
+  commonName: "{{ $certName }}-scheduler-server"
+  secretName: "{{ $fullName }}-pki-scheduler-server"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "server auth"
+  dnsNames:
+  - "{{ $svcName1 }}"
+  - "{{ $svcName2 }}"
+  - "{{ $svcName3 }}"
+  - "{{ $podName1 }}"
+  - "{{ $podName2 }}"
+  - "{{ $podName3 }}"
+  - "localhost"
+  {{- with .Values.apiServer.certSANs.dnsNames }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
+  ipAddresses:
+  - "127.0.0.1"
+  - "10.96.0.1"
+  {{- with .Values.apiServer.service.loadBalancerIP }}
+  {{- if not (has . $.Values.apiServer.certSANs.ipAddresses) }}
+  - {{ . | quote }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.apiServer.certSANs.ipAddresses }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
+  issuerRef:
+    name: "{{ $fullName }}-issuer"
+    kind: Issuer
+---
+{{- $svcName1 := printf "%s-apiserver" $fullName }}
+{{- $svcName2 := printf "%s-apiserver.%s" $fullName .Release.Namespace }}
+{{- $svcName3 := printf "%s-apiserver.%s.svc" $fullName .Release.Namespace }}
+{{- $podName1 := printf "*.%s-apiserver" $fullName }}
+{{- $podName2 := printf "*.%s-apiserver.%s" $fullName .Release.Namespace }}
+{{- $podName3 := printf "*.%s-apiserver.%s.svc" $fullName .Release.Namespace }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-apiserver-server"
+spec:
+  commonName: "{{ $certName }}-apiserver-server"
+  secretName: "{{ $fullName }}-pki-apiserver-server"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "{{ $fullName }}"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "server auth"
+  dnsNames:
+  - "{{ $svcName1 }}"
+  - "{{ $svcName2 }}"
+  - "{{ $svcName3 }}"
+  - "{{ $podName1 }}"
+  - "{{ $podName2 }}"
+  - "{{ $podName3 }}"
+  - "localhost"
+  {{- with .Values.apiServer.certSANs.dnsNames }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
+  ipAddresses:
+  - "127.0.0.1"
+  - "10.96.0.1"
+  {{- with .Values.apiServer.service.loadBalancerIP }}
+  {{- if not (has . $.Values.apiServer.certSANs.ipAddresses) }}
+  - {{ . | quote }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.apiServer.certSANs.ipAddresses }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
+  issuerRef:
+    name: "{{ $fullName }}-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-controller-manager-client"
+spec:
+  commonName: "system:kube-controller-manager"
+  secretName: "{{ $fullName }}-pki-controller-manager-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "system:kube-controller-manager"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  issuerRef:
+    name: "{{ $fullName }}-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-scheduler-client"
+spec:
+  commonName: "system:kube-scheduler"
+  secretName: "{{ $fullName }}-pki-scheduler-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "system:kube-scheduler"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  issuerRef:
+    name: "{{ $fullName }}-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-konnectivity-server-client"
+spec:
+  commonName: "system:konnectivity-server"
+  secretName: "{{ $fullName }}-pki-konnectivity-server-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "system:konnectivity-server"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
+  issuerRef:
+    name: "{{ $fullName }}-issuer"
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{ $fullName }}-pki-admin-client"
+spec:
+  commonName: "{{ $certName }}-admin-client"
+  secretName: "{{ $fullName }}-pki-admin-client"
+  duration: 8760h # 365d
+  renewBefore: 4380h # 178d
+  subject:
+    organizations:
+    - "system:masters"
+  usages:
+  - "signing"
+  - "key encipherment"
+  - "client auth"
   issuerRef:
     name: "{{ $fullName }}-issuer"
     kind: Issuer

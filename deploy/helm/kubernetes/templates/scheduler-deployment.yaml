@@ -83,6 +83,10 @@ spec:
         - mountPath: /etc/kubernetes/
           name: kubeconfig
           readOnly: true
+        - mountPath: /pki/scheduler-server
+          name: pki-scheduler-server
+        - mountPath: /pki/scheduler-client
+          name: pki-scheduler-client
         {{- with .Values.scheduler.extraVolumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -90,9 +94,16 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       volumes:
-      - secret:
-          secretName: "{{ $fullName }}-scheduler-conf"
+      - configMap:
+          name: "{{ $fullName }}-scheduler-conf"
         name: kubeconfig
+      - secret:
+          secretName: "{{ $fullName }}-pki-scheduler-server"
+        name: pki-scheduler-server
+      - secret:
+          secretName: "{{ $fullName }}-pki-scheduler-client"
+        name: pki-scheduler-client
+
       {{- with .Values.scheduler.extraVolumes }}
       {{- toYaml . | nindent 6 }}
       {{- end }}

@@ -92,7 +92,7 @@ spec:
           secretName: "{{ $fullName }}-pki-front-proxy-client"
         name: pki-front-proxy-client
       - secret:
-          secretName: "{{ $fullName }}-pki-apiserver"
+          secretName: "{{ $fullName }}-pki-apiserver-server"
         name: pki-apiserver
       - secret:
           secretName: "{{ $fullName }}-pki-apiserver-etcd-client"

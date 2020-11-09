@@ -80,6 +80,8 @@ spec:
         - mountPath: /etc/kubernetes/
           name: kubeconfig
           readOnly: true
+        - mountPath: /pki/admin-client
+          name: pki-admin-client
         {{- with .Values.admin.extraVolumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -87,9 +89,12 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       volumes:
-      - secret:
-          secretName: "{{ $fullName }}-admin-conf"
+      - configMap:
+          name: "{{ $fullName }}-admin-conf"
         name: kubeconfig
+      - secret:
+          secretName: "{{ $fullName }}-pki-admin-client"
+        name: pki-admin-client
       {{- with .Values.admin.extraVolumes }}
       {{- toYaml . | nindent 6 }}
       {{- end }}

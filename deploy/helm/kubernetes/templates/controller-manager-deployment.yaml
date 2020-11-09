@@ -92,6 +92,10 @@ spec:
         - mountPath: /etc/kubernetes/
           name: kubeconfig
           readOnly: true
+        - mountPath: /pki/controller-manager-server
+          name: pki-controller-manager-server
+        - mountPath: /pki/controller-manager-client
+          name: pki-controller-manager-client
         - mountPath: /pki/ca
           name: pki-ca
         - mountPath: /pki/front-proxy-client
@@ -105,9 +109,15 @@ spec:
       {{- toYaml . | nindent 6 }}
       {{- end }}
       volumes:
-      - secret:
-          secretName: "{{ $fullName }}-controller-manager-conf"
+      - configMap:
+          name: "{{ $fullName }}-controller-manager-conf"
         name: kubeconfig
+      - secret:
+          secretName: "{{ $fullName }}-pki-controller-manager-server"
+        name: pki-controller-manager-server
+      - secret:
+          secretName: "{{ $fullName }}-pki-controller-manager-client"
+        name: pki-controller-manager-client
       - secret:
           secretName: "{{ $fullName }}-pki-ca"
         name: pki-ca
