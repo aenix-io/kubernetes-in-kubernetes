@@ -14,7 +14,7 @@ etcd:
   enabled: true
   image:
     repository: k8s.gcr.io/etcd
-    tag: 3.4.9-1
+    tag: 3.4.13-0
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 3
