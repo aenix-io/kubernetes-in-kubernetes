@@ -47,7 +47,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
-      {{- with .Values.etcd.image.PullSecrets }}
+      {{- with .Values.etcd.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
@@ -97,6 +97,7 @@ spec:
         {{- end }}
         {{- with .Values.etcd.image }}
         image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
         ports:
         - containerPort: {{ .Values.etcd.ports.client }}
@@ -105,7 +106,6 @@ spec:
           name: peer
         - containerPort: {{ .Values.etcd.ports.metrics }}
           name: metrics
-        imagePullPolicy: {{ .Values.etcd.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:

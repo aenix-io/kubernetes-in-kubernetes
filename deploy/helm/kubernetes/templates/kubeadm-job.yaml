@@ -43,7 +43,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.admin.image.PullSecrets }}
+      {{- with .Values.admin.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
@@ -53,8 +53,8 @@ spec:
       - name: kubeadm
         {{- with .Values.admin.image }}
         image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
-        imagePullPolicy: {{ .Values.admin.image.PullPolicy }}
         command: [ '/scripts/configure-cluster.sh' ]
         env:
         - name: KUBECONFIG

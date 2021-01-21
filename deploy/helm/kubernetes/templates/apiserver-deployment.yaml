@@ -45,7 +45,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.apiServer.image.PullSecrets }}
+      {{- with .Values.apiServer.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
@@ -98,8 +98,8 @@ spec:
           name: client
         {{- with .Values.apiServer.image }}
         image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
-        imagePullPolicy: {{ .Values.apiServer.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:

@@ -14,9 +14,9 @@ etcd:
   enabled: true
   image:
     repository: k8s.gcr.io/etcd
-    tag: 3.4.9-1
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    tag: 3.4.13-0
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 3
   resources:
     requests:
@@ -64,9 +64,9 @@ apiServer:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-apiserver
-    tag: v1.19.3
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    tag: v1.20.2
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -111,9 +111,9 @@ controllerManager:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-controller-manager
-    tag: v1.19.3
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    tag: v1.20.2
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -149,9 +149,9 @@ scheduler:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-scheduler
-    tag: v1.19.3
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    tag: v1.20.2
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -186,10 +186,10 @@ scheduler:
 admin:
   enabled: true
   image:
-    repository: docker.io/kvaps/kubernetes-tools
-    tag: v1.19.3
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    repository: ghcr.io/kvaps/kubernetes-tools
+    tag: v0.9.0
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 1
   resources:
     requests:
@@ -227,9 +227,9 @@ konnectivityServer:
   enabled: false
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-server
-    tag: v0.0.12
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    tag: v0.0.14
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -276,9 +276,9 @@ konnectivityAgent:
   enabled: false
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-agent
-    tag: v0.0.12
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    tag: v0.0.14
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   hostNetwork: true
 
