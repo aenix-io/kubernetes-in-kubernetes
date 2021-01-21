@@ -186,8 +186,8 @@ scheduler:
 admin:
   enabled: true
   image:
-    repository: docker.io/kvaps/kubernetes-tools
-    tag: v1.20.2
+    repository: ghcr.io/kvaps/kubernetes-tools
+    tag: v0.9.0
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 1
