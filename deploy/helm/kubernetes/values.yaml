@@ -227,7 +227,7 @@ konnectivityServer:
   enabled: false
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-server
-    tag: v0.0.12
+    tag: v0.0.14
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -276,7 +276,7 @@ konnectivityAgent:
   enabled: false
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-agent
-    tag: v0.0.12
+    tag: v0.0.14
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
