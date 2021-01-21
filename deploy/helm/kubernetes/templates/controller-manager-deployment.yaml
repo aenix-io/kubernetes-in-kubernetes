@@ -43,7 +43,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.controllerManager.image.PullSecrets }}
+      {{- with .Values.controllerManager.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
@@ -73,8 +73,8 @@ spec:
         {{- end }}
         {{- with .Values.controllerManager.image }}
         image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+        imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
-        imagePullPolicy: {{ .Values.controllerManager.image.PullPolicy }}
         livenessProbe:
           failureThreshold: 8
           httpGet:

@@ -43,7 +43,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.konnectivityServer.image.PullSecrets }}
+      {{- with .Values.konnectivityServer.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
       {{- end }}
@@ -82,7 +82,7 @@ spec:
           name: health
         {{- with .Values.konnectivityServer.image }}
         image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
-        imagePullPolicy: {{ .PullPolicy }}
+        imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
         livenessProbe:
           failureThreshold: 8

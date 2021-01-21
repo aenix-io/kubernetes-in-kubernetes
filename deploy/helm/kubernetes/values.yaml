@@ -15,8 +15,8 @@ etcd:
   image:
     repository: k8s.gcr.io/etcd
     tag: 3.4.9-1
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 3
   resources:
     requests:
@@ -65,8 +65,8 @@ apiServer:
   image:
     repository: k8s.gcr.io/kube-apiserver
     tag: v1.20.2
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -112,8 +112,8 @@ controllerManager:
   image:
     repository: k8s.gcr.io/kube-controller-manager
     tag: v1.20.2
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -150,8 +150,8 @@ scheduler:
   image:
     repository: k8s.gcr.io/kube-scheduler
     tag: v1.20.2
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -188,8 +188,8 @@ admin:
   image:
     repository: docker.io/kvaps/kubernetes-tools
     tag: v1.20.2
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 1
   resources:
     requests:
@@ -228,8 +228,8 @@ konnectivityServer:
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-server
     tag: v0.0.12
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   resources:
     requests:
@@ -277,8 +277,8 @@ konnectivityAgent:
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-agent
     tag: v0.0.12
-    PullPolicy: IfNotPresent
-    PullSecrets: []
+    pullPolicy: IfNotPresent
+    pullSecrets: []
   replicaCount: 2
   hostNetwork: true
 
