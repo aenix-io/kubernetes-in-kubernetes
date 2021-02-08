@@ -31,7 +31,11 @@ kubeadm init phase upload-config kubelet --config /config/kubeadmcfg.yaml -v1 2>
 
 # setup bootstrap-tokens
 # TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/7
-kubeadm init phase bootstrap-token --config /config/kubeadmcfg.yaml --skip-token-print
+# TODO: https://github.com/kubernetes/kubernetes/issues/98881
+flatconfig=$(mktemp)
+kubectl config view --flatten > "$flatconfig"
+kubeadm init phase bootstrap-token --config /config/kubeadmcfg.yaml --skip-token-print --kubeconfig="$flatconfig"
+rm -f "$flatconfig"
 
 # correct apiserver address for the external clients
 kubectl apply -n kube-public -f - <<EOT
