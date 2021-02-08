@@ -1,6 +1,6 @@
 name: kubernetes
 description: Production-Grade Container Scheduling and Management
-version: 0.9.0
+version: 1.9.1
 appVersion: v1.20.2
 icon: https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Kubernetes_logo_without_workmark.svg/723px-Kubernetes_logo_without_workmark.svg.png
 keywords:
