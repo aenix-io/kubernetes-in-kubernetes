@@ -80,9 +80,9 @@ spec:
         - --tls-cert-file=/pki/apiserver-server/tls.crt
         - --tls-private-key-file=/pki/apiserver-server/tls.key
         - --egress-selector-config-file=/etc/kubernetes/egress-selector-configuration.yaml
-        {{- if .Values.konnectivityAgent.enabled }}{{"\n"}}
-        - --service-account-issuer=api
+        - --service-account-issuer=https://kubernetes.default.svc.cluster.local
         - --service-account-signing-key-file=/pki/sa/tls.key
+        {{- if .Values.konnectivityAgent.enabled }}{{"\n"}}
         - --api-audiences=system:konnectivity-server
         {{- end }}
         {{- if not (hasKey .Values.apiServer.extraArgs "advertise-address") }}
