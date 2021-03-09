@@ -103,7 +103,7 @@ spec:
         livenessProbe:
           failureThreshold: 8
           httpGet:
-            path: /healthz
+            path: /livez
             port: {{ .Values.apiServer.port }}
             scheme: HTTPS
           initialDelaySeconds: 15
