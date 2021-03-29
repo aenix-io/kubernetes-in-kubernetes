@@ -34,9 +34,6 @@ spec:
 {{- $svcName1 := printf "%s-konnectivity-server" $fullName }}
 {{- $svcName2 := printf "%s-konnectivity-server.%s" $fullName .Release.Namespace }}
 {{- $svcName3 := printf "%s-konnectivity-server.%s.svc" $fullName .Release.Namespace }}
-{{- $podName1 := printf "*.%s-konnectivity-server" $fullName }}
-{{- $podName2 := printf "*.%s-konnectivity-server.%s" $fullName .Release.Namespace }}
-{{- $podName3 := printf "*.%s-konnectivity-server.%s.svc" $fullName .Release.Namespace }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -57,9 +54,6 @@ spec:
   - "{{ $svcName1 }}"
   - "{{ $svcName2 }}"
   - "{{ $svcName3 }}"
-  - "{{ $podName1 }}"
-  - "{{ $podName2 }}"
-  - "{{ $podName3 }}"
   - "localhost"
   ipAddresses:
   - "127.0.0.1"
