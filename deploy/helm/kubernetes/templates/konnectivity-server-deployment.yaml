@@ -39,9 +39,28 @@ spec:
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      {{- with .Values.konnectivityServer.affinity }}
+      {{- if or .Values.konnectivityServer.affinity .Values.konnectivityServer.podAntiAffinity }}
       affinity:
+        {{- with .Values.konnectivityServer.affinity }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if eq .Values.konnectivityServer.podAntiAffinity "hard" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "{{ .Values.konnectivityServer.podAntiAffinityTopologyKey }}"
+              labelSelector:
+                matchLabels:
+                  app: {{ $fullName }}-konnectivity-server
+        {{- else if eq .Values.konnectivityServer.podAntiAffinity "soft" }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "{{ .Values.konnectivityServer.podAntiAffinityTopologyKey }}"
+                labelSelector:
+                  matchLabels:
+                    app: {{ $fullName }}-konnectivity-server
+        {{- end }}
       {{- end }}
       {{- with .Values.konnectivityServer.image.pullSecrets }}
       imagePullSecrets:

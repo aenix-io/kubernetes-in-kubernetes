@@ -41,9 +41,28 @@ spec:
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      {{- with .Values.apiServer.affinity }}
+      {{- if or .Values.apiServer.affinity .Values.apiServer.podAntiAffinity }}
       affinity:
+        {{- with .Values.apiServer.affinity }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if eq .Values.apiServer.podAntiAffinity "hard" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "{{ .Values.apiServer.podAntiAffinityTopologyKey }}"
+              labelSelector:
+                matchLabels:
+                  app: {{ $fullName }}-apiserver
+        {{- else if eq .Values.apiServer.podAntiAffinity "soft" }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "{{ .Values.apiServer.podAntiAffinityTopologyKey }}"
+                labelSelector:
+                  matchLabels:
+                    app: {{ $fullName }}-apiserver
+        {{- end }}
       {{- end }}
       {{- with .Values.apiServer.image.pullSecrets }}
       imagePullSecrets:

@@ -39,9 +39,28 @@ spec:
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      {{- with .Values.scheduler.affinity }}
+      {{- if or .Values.scheduler.affinity .Values.scheduler.podAntiAffinity }}
       affinity:
+        {{- with .Values.scheduler.affinity }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if eq .Values.scheduler.podAntiAffinity "hard" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "{{ .Values.scheduler.podAntiAffinityTopologyKey }}"
+              labelSelector:
+                matchLabels:
+                  app: {{ $fullName }}-scheduler
+        {{- else if eq .Values.scheduler.podAntiAffinity "soft" }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "{{ .Values.scheduler.podAntiAffinityTopologyKey }}"
+                labelSelector:
+                  matchLabels:
+                    app: {{ $fullName }}-scheduler
+        {{- end }}
       {{- end }}
       {{- with .Values.scheduler.image.pullSecrets }}
       imagePullSecrets:

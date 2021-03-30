@@ -39,9 +39,28 @@ spec:
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      {{- with .Values.controllerManager.affinity }}
+      {{- if or .Values.controllerManager.affinity .Values.controllerManager.podAntiAffinity }}
       affinity:
+        {{- with .Values.controllerManager.affinity }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if eq .Values.controllerManager.podAntiAffinity "hard" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "{{ .Values.controllerManager.podAntiAffinityTopologyKey }}"
+              labelSelector:
+                matchLabels:
+                  app: {{ $fullName }}-controller-manager
+        {{- else if eq .Values.controllerManager.podAntiAffinity "soft" }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "{{ .Values.controllerManager.podAntiAffinityTopologyKey }}"
+                labelSelector:
+                  matchLabels:
+                    app: {{ $fullName }}-controller-manager
+        {{- end }}
       {{- end }}
       {{- with .Values.controllerManager.image.pullSecrets }}
       imagePullSecrets:

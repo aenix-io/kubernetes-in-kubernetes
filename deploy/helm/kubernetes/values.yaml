@@ -39,6 +39,8 @@ etcd:
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
+  podAntiAffinity: soft
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
   affinity: {}
   extraEnv: []
   sidecars: []
@@ -89,6 +91,8 @@ apiServer:
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
+  podAntiAffinity: soft
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
   affinity: {}
   extraEnv: []
   sidecars: []
@@ -130,6 +134,8 @@ controllerManager:
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
+  podAntiAffinity: soft
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
   affinity: {}
   extraEnv: []
   sidecars: []
@@ -168,6 +174,8 @@ scheduler:
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
+  podAntiAffinity: soft
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
   affinity: {}
   extraEnv: []
   sidecars: []
@@ -211,6 +219,8 @@ admin:
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
+  podAntiAffinity: soft
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
   affinity: {}
   extraEnv: []
   sidecars: []
@@ -246,6 +256,8 @@ konnectivityServer:
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
+  podAntiAffinity: soft
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
   affinity: {}
   extraEnv: []
   sidecars: []
@@ -289,6 +301,8 @@ konnectivityAgent:
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
+  podAntiAffinity: soft
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
   affinity: {}
   extraEnv: []
   sidecars: []

@@ -42,11 +42,29 @@ spec:
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
-      {{- with .Values.etcd.affinity }}
+      {{- if or .Values.etcd.affinity .Values.etcd.podAntiAffinity }}
       affinity:
+        {{- with .Values.etcd.affinity }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if eq .Values.etcd.podAntiAffinity "hard" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "{{ .Values.etcd.podAntiAffinityTopologyKey }}"
+              labelSelector:
+                matchLabels:
+                  app: {{ $fullName }}-etcd
+        {{- else if eq .Values.etcd.podAntiAffinity "soft" }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: "{{ .Values.etcd.podAntiAffinityTopologyKey }}"
+                labelSelector:
+                  matchLabels:
+                    app: {{ $fullName }}-etcd
+        {{- end }}
       {{- end }}
-
       {{- with .Values.etcd.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 10 }}
