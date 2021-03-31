@@ -79,7 +79,7 @@ spec:
         - --data-dir=/var/lib/etcd
         - --initial-advertise-peer-urls=https://$(POD_NAME).{{ $fullName }}-etcd:{{ .Values.etcd.ports.peer }}
         - --initial-cluster={{ template "kubernetes.etcdInitialCluster" . }}
-        - --initial-cluster-state=new
+        - --initial-cluster-state={{ ternary "new" "existing" .Release.IsInstall }}
         - --initial-cluster-token={{ $fullName }}-etcd
         - --key-file=/pki/etcd/server/tls.key
         - --listen-client-urls=https://0.0.0.0:{{ .Values.etcd.ports.client }}
