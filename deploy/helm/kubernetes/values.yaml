@@ -10,6 +10,17 @@ persistence:
   finalizers:
     - kubernetes.io/pvc-protection
 
+  backup:
+    # existingClaim: your-claim
+    # subPath: backups
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+    # storageClassName: default
+    annotations: {}
+    finalizers:
+      - kubernetes.io/pvc-protection
+
 etcd:
   enabled: true
   image:
@@ -61,6 +72,35 @@ etcd:
     labels: {}
     annotations: {}
     loadBalancerIP:
+
+  backup:
+    enabled: false
+    schedule: "0 */12 * * *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    extraArgs: #{}
+      debug: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+    labels: {}
+    annotations: {}
+    podLabels: {}
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    podAffinity: soft
+    podAffinityTopologyKey: kubernetes.io/hostname
+    affinity: {}
+    extraEnv: []
+    sidecars: []
+    extraVolumes: []
+    extraVolumeMounts: []
 
 apiServer:
   enabled: true

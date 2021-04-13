@@ -1,0 +1,146 @@
+{{- if .Values.etcd.backup.enabled }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ $fullName }}-etcd-backup
+  labels:
+    app: {{ $fullName }}-etcd-backup
+    {{- with .Values.etcd.backup.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.etcd.backup.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: "{{ .Values.etcd.backup.schedule }}"
+  successfulJobsHistoryLimit: {{ .Values.etcd.backup.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.etcd.backup.failedJobsHistoryLimit }}
+  jobTemplate:
+    metadata:
+      labels:
+        app: {{ $fullName }}-etcd-backup
+        {{- with .Values.etcd.backup.labels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.etcd.backup.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ $fullName }}-etcd-backup
+            {{- with .Values.etcd.backup.podLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.etcd.backup.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- with .Values.etcd.backup.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.etcd.backup.tolerations }}
+          tolerations:
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- if or .Values.etcd.backup.affinity .Values.etcd.backup.podAffinity }}
+          affinity:
+            {{- with .Values.etcd.backup.affinity }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if eq .Values.etcd.backup.podAffinity "hard" }}
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: "{{ .Values.etcd.backup.podAffinityTopologyKey }}"
+                  labelSelector:
+                    matchLabels:
+                      app: {{ $fullName }}-etcd
+            {{- else if eq .Values.etcd.backup.podAffinity "soft" }}
+            podAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 1
+                  podAffinityTerm:
+                    topologyKey: "{{ .Values.etcd.backup.podAffinityTopologyKey }}"
+                    labelSelector:
+                      matchLabels:
+                        app: {{ $fullName }}-etcd
+            {{- end }}
+          {{- end }}
+
+          {{- with .Values.etcd.image.pullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          automountServiceAccountToken: false
+          restartPolicy: OnFailure
+          containers:
+          - command:
+            - /bin/sh
+            - -xc
+            - |
+              rtc() { while read k s v; do test "$k" = "rtc_$1" && echo "$v" && break; done </proc/driver/rtc; }
+              etcdctl snapshot save /data/etcd-prod-hosting-$(rtc date)-$(rtc time).db
+              {{- range $key, $value := .Values.etcd.backup.extraArgs }} --{{ $key }}={{ $value }}{{- end }}
+            env:
+            - name: ETCDCTL_API
+              value: "3"
+            - name: ETCDCTL_CACERT
+              value: /pki/etcd/peer/ca.crt
+            - name: ETCDCTL_CERT
+              value: /pki/etcd/peer/tls.crt
+            - name: ETCDCTL_KEY
+              value: /pki/etcd/peer/tls.key 
+            - name: ETCDCTL_ENDPOINTS
+              value: {{ $fullName }}-etcd:{{ .Values.etcd.ports.client }}
+            {{- with .Values.etcd.backup.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.etcd.image }}
+            image: "{{ .repository }}{{ if .digest }}@{{ .digest }}{{ else }}:{{ .tag }}{{ end }}"
+            imagePullPolicy: {{ .pullPolicy }}
+            {{- end }}
+            name: etcd-backup
+            resources:
+              {{- toYaml .Values.etcd.backup.resources | nindent 14 }}
+            volumeMounts:
+            - mountPath: /pki/etcd/ca
+              name: pki-etcd-certs-ca
+            - mountPath: /pki/etcd/peer
+              name: pki-etcd-certs-peer
+            - mountPath: /pki/etcd/server
+              name: pki-etcd-certs-server
+            - mountPath: /data
+              name: data
+              {{- with .Values.persistence.backup.subPath }}
+              subPath: {{ . }}
+              {{- end }}
+            {{- with .Values.etcd.backup.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.etcd.backup.sidecars }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          volumes:
+          - secret:
+              secretName: {{ $fullName }}-pki-etcd-ca
+            name: pki-etcd-certs-ca
+          - secret:
+              secretName: {{ $fullName }}-pki-etcd-peer
+            name: pki-etcd-certs-peer
+          - secret:
+              secretName: {{ $fullName }}-pki-etcd-server
+            name: pki-etcd-certs-server
+          - name: data
+            persistentVolumeClaim: 
+              claimName: {{ .Values.persistence.backup.existingClaim | default (printf "etcd-backup-%s-etcd" $fullName) }}
+          {{- with .Values.etcd.backup.extraVolumes }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+{{- end }}

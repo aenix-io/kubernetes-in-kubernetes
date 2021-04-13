@@ -1,0 +1,33 @@
+{{- if and .Values.etcd.backup.enabled (not .Values.persistence.backup.existingClaim)  }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: etcd-backup
+  labels:
+    app: {{ $fullName }}-etcd
+    {{- if .Values.persistence.backup.labels }}
+    {{- toYaml .Values.persistence.backup.labels | nindent 4 }}
+    {{- end }}
+  annotations:
+    helm.sh/resource-policy: keep
+    {{- with .Values.persistence.backup.annotations  }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.persistence.backup.finalizers  }}
+  finalizers:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- range .Values.persistence.backup.accessModes }}
+    - {{ . | quote }}
+    {{- end }}
+  {{- if .Values.persistence.backup.storageClassName }}
+  storageClassName: {{ .Values.persistence.backup.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.backup.size | quote }}
+{{- end }}
