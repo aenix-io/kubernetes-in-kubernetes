@@ -272,6 +272,18 @@ kubeProxy:
 
 coredns:
   enabled: true
+  image:
+    repository: coredns/coredns
+    tag: 1.8.3
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  replicaCount: 2
+  resources:
+    limits:
+      memory: 170Mi
+    requests:
+      cpu: 100m
+      memory: 70Mi
 
 konnectivityServer:
   enabled: false

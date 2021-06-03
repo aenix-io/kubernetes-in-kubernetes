@@ -61,3 +61,13 @@ Generate etcd servers list.
     {{- end -}}
   {{- end -}}
 {{- end -}}
+
+{{- define "getCoreDNS" -}}
+  {{- $octetsList := splitList "." .Values.apiServer.serviceClusterIPRange -}}
+  {{- printf "%d.%d.%d.%d" (index $octetsList 0 | int) (index $octetsList 1 | int) (index $octetsList 2 | int) 10 -}}
+{{- end -}}
+
+{{- define "getAPIAddress" -}}
+  {{- $octetsList := splitList "." .Values.apiServer.serviceClusterIPRange -}}
+  {{- printf "%d.%d.%d.%d" (index $octetsList 0 | int) (index $octetsList 1 | int) (index $octetsList 2 | int) 1 -}}
+{{- end -}}

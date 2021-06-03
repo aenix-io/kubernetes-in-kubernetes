@@ -70,7 +70,7 @@ spec:
           name: pki-admin-client
         - mountPath: /scripts
           name: scripts
-        {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+        {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled .Values.coredns.enabled }}
         - mountPath: /manifests
           name: manifests
         {{- end }}
@@ -93,7 +93,7 @@ spec:
         configMap:
           name: "{{ $fullName }}-kubeadm-scripts"
           defaultMode: 0777
-      {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
+      {{- if or .Values.extraManifests .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled .Values.coredns.enabled }}
       - name: manifests
         projected:
           sources:
@@ -104,6 +104,10 @@ spec:
           {{- if or .Values.konnectivityServer.enabled .Values.konnectivityAgent.enabled }}
           - configMap:
               name: "{{ $fullName }}-konnectivity-manifests"
+          {{- end }}
+          {{- if .Values.coredns.enabled }}
+          - configMap:
+              name: "{{ $fullName }}-kubedns-manifests"
           {{- end }}
       {{- end }}
       - name: config
