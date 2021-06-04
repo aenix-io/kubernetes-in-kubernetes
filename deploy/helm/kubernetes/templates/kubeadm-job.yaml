@@ -107,7 +107,7 @@ spec:
           {{- end }}
           {{- if .Values.coredns.enabled }}
           - configMap:
-              name: "{{ $fullName }}-kubedns-manifests"
+              name: "{{ $fullName }}-coredns-manifests"
           {{- end }}
       {{- end }}
       - name: config
