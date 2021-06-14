@@ -62,7 +62,7 @@ EOT
 # install konnectivity server
 kubectl apply -f /manifests/konnectivity-server-rbac.yaml
 {{- else }}{{"\n"}}
-kubectl delete clusterrolebinding/system:konnectivity-server 2>/dev/null || true
+kubectl delete -f /manifests/konnectivity-server-rbac.yaml 2>/dev/null || true
 {{- end }}
 
 {{- if .Values.konnectivityAgent.enabled }}{{"\n"}}
@@ -70,16 +70,15 @@ kubectl delete clusterrolebinding/system:konnectivity-server 2>/dev/null || true
 kubectl apply -f /manifests/konnectivity-agent-deployment.yaml -f /manifests/konnectivity-agent-rbac.yaml
 {{- else }}{{"\n"}}
 # uninstall konnectivity agent
-kubectl -n kube-system delete deployment/konnectivity-agent serviceaccount/konnectivity-agent 2>/dev/null || true
+kubectl delete -f /manifests/konnectivity-agent-deployment.yaml -f /manifests/konnectivity-agent-rbac.yaml 2>/dev/null || true
 {{- end }}
 
 {{- if .Values.coredns.enabled }}{{"\n"}}
 # install coredns addon
-# TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/3
-kubeadm init phase addon coredns --config /config/kubeadmcfg.yaml
+kubectl apply -f /manifests/coredns.yaml
 {{- else }}{{"\n"}}
 # uninstall coredns addon
-kubectl -n kube-system delete configmap/coredns deployment/coredns 2>/dev/null || true
+kubectl delete -f /manifests/coredns.yaml 2>/dev/null || true
 {{- end }}
 
 {{- if .Values.kubeProxy.enabled }}{{"\n"}}

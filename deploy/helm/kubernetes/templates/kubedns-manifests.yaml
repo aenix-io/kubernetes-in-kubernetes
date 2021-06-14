@@ -1,0 +1,13 @@
+{{- if .Values.coredns.enabled }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullName }}-coredns-manifests
+data:
+  {{- if .Values.coredns.enabled }}
+  coredns.yaml: |
+    {{- tpl (.Files.Get "manifests/coredns-1.8.yaml") . | nindent 4 }}
+  {{- end }}
+{{- end }}

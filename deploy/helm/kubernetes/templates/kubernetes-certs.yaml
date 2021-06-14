@@ -80,7 +80,7 @@ spec:
   {{- end }}
   ipAddresses:
   - "127.0.0.1"
-  - "10.96.0.1"
+  - "{{- template "getAPIAddress" . }}"
   {{- with .Values.apiServer.service.loadBalancerIP }}
   {{- if not (has . $.Values.apiServer.certSANs.ipAddresses) }}
   - {{ . | quote }}
@@ -122,7 +122,7 @@ spec:
   {{- end }}
   ipAddresses:
   - "127.0.0.1"
-  - "10.96.0.1"
+  - "{{- template "getAPIAddress" . }}"
   {{- with .Values.apiServer.service.loadBalancerIP }}
   {{- if not (has . $.Values.apiServer.certSANs.ipAddresses) }}
   - {{ . | quote }}
@@ -164,7 +164,7 @@ spec:
   {{- end }}
   ipAddresses:
   - "127.0.0.1"
-  - "10.96.0.1"
+  - "{{- template "getAPIAddress" . }}"
   {{- with .Values.apiServer.service.loadBalancerIP }}
   {{- if not (has . $.Values.apiServer.certSANs.ipAddresses) }}
   - {{ . | quote }}
