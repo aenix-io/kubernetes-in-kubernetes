@@ -8,6 +8,6 @@ metadata:
 data:
   {{- if .Values.coredns.enabled }}
   coredns.yaml: |
-    {{- tpl (.Files.Get "manifests/coredns-1.8.yaml") . | nindent 4 }}
+    {{- tpl (.Files.Get "manifests/coredns.yaml") . | nindent 4 }}
   {{- end }}
 {{- end }}
