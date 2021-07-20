@@ -206,7 +206,7 @@ metadata:
 spec:
   selector:
     k8s-app: kube-dns
-  clusterIP: {{ template "getCoreDNS" . }}
+  clusterIP: {{ template "kubernetes.getCoreDNS" . }}
   ports:
   - name: dns
     port: 53

@@ -65,12 +65,12 @@ Generate etcd servers list.
 {{/*
 Take the first IP address from the serviceClusterIPRange for the kube-dns service.
 */}}
-{{- define "getCoreDNS" -}}
+{{- define "kubernetes.getCoreDNS" -}}
   {{- $octetsList := splitList "." .Values.apiServer.serviceClusterIPRange -}}
   {{- printf "%d.%d.%d.%d" (index $octetsList 0 | int) (index $octetsList 1 | int) (index $octetsList 2 | int) 10 -}}
 {{- end -}}
 
-{{- define "getAPIAddress" -}}
+{{- define "kubernetes.getAPIAddress" -}}
   {{- $octetsList := splitList "." .Values.apiServer.serviceClusterIPRange -}}
   {{- printf "%d.%d.%d.%d" (index $octetsList 0 | int) (index $octetsList 1 | int) (index $octetsList 2 | int) 1 -}}
 {{- end -}}
