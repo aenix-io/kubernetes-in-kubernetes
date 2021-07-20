@@ -12,14 +12,23 @@ data:
     - name: cluster
       connection:
         {{- if and .Values.konnectivityServer.enabled }}
-        proxyProtocol: HTTPConnect
+        {{- if has .Values.konnectivityServer.mode (list "HTTPConnect" "GRPC") }}
+        proxyProtocol: {{ .Values.konnectivityServer.mode }}
+        {{- else }}
+        {{- fail ".Values.konnectivityServer.mode supports only \"HTTPConnect\" and \"GRPC\" values" }}
+        {{- end }}
         transport:
+          {{- if eq .Values.konnectivityServer.mode "GRPC" }}
+          uds:
+            udsName: /run/konnectivity-server/konnectivity-server.socket
+          {{- else }}
           tcp:
             url: "https://{{ $fullName }}-konnectivity-server:8131"
             TLSConfig:
               caBundle: /pki/konnectivity-client/ca.crt
               clientKey: /pki/konnectivity-client/tls.key
               clientCert: /pki/konnectivity-client/tls.crt
+          {{- end }}
         {{- else }}
         proxyProtocol: Direct
         {{- end }}

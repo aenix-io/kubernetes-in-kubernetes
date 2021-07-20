@@ -287,6 +287,11 @@ coredns:
 
 konnectivityServer:
   enabled: false
+  # This controls the protocol between the API Server and the Konnectivity server.
+  # Supported values are "GRPC" and "HTTPConnect".
+  # "GRPC" will deploy konnectivity-server as a sidecar for apiserver
+  # "HTTPConnect" will deploy konnectivity-server as separate deployment
+  mode: GRPC
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-server
     tag: v0.0.20

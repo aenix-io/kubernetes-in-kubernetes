@@ -1,4 +1,4 @@
-{{- if and .Values.konnectivityServer.enabled .Values.konnectivityServer.service.enabled }}
+{{- if and .Values.konnectivityServer.enabled .Values.konnectivityServer.service.enabled (eq .Values.konnectivityServer.mode "HTTPConnect") }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
 apiVersion: v1

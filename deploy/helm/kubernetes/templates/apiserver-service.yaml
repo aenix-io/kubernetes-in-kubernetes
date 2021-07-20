@@ -11,7 +11,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if not (index .Values.apiServer.service.annotations "metallb.universe.tf/allow-shared-ip") }}
+    {{- if and (not (index .Values.apiServer.service.annotations "metallb.universe.tf/allow-shared-ip")) (eq .Values.konnectivityServer.mode "HTTPConnect") }}
     metallb.universe.tf/allow-shared-ip: {{ $fullName }}
     {{- end }}
     {{- with .Values.apiServer.service.annotations }}
@@ -28,6 +28,13 @@ spec:
     {{- with .Values.apiServer.service.nodePort }}
     nodePort: {{ . }}
     {{- end }}
+  {{- if and .Values.konnectivityServer.enabled .Values.konnectivityServer.service.enabled (eq .Values.konnectivityServer.mode "GRPC") }}
+  - port: {{ .Values.konnectivityServer.ports.agent }}
+    name: agent
+    {{- with .Values.konnectivityServer.service.nodePorts.client }}
+    nodePort: {{ . }}
+    {{- end }}
+  {{- end }}
   selector:
     app: {{ $fullName }}-apiserver
 {{- end }}
