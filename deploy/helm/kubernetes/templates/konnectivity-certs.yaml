@@ -1,4 +1,4 @@
-{{- if and .Values.konnectivityServer.enabled }}
+{{- if and .Values.konnectivityServer.enabled (eq .Values.konnectivityServer.mode "HTTPConnect") }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 {{- $certName := include "kubernetes.certname" . -}}
 ---
@@ -30,6 +30,7 @@ metadata:
 spec:
   ca:
     secretName: "{{ $fullName }}-pki-konnectivity-ca"
+
 ---
 {{- $svcName1 := printf "%s-konnectivity-server" $fullName }}
 {{- $svcName2 := printf "%s-konnectivity-server.%s" $fullName .Release.Namespace }}
