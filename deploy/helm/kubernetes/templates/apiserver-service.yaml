@@ -11,9 +11,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if and (not (index .Values.apiServer.service.annotations "metallb.universe.tf/allow-shared-ip")) (eq .Values.konnectivityServer.mode "HTTPConnect") }}
-    metallb.universe.tf/allow-shared-ip: {{ $fullName }}
-    {{- end }}
     {{- with .Values.apiServer.service.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

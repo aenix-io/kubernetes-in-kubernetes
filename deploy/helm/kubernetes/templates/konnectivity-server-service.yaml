@@ -11,9 +11,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if not (index .Values.konnectivityServer.service.annotations "metallb.universe.tf/allow-shared-ip") }}
-    metallb.universe.tf/allow-shared-ip: {{ $fullName }}
-    {{- end }}
     {{- with .Values.konnectivityServer.service.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
