@@ -101,7 +101,7 @@ spec:
         - --egress-selector-config-file=/etc/kubernetes/egress-selector-configuration.yaml
         - --service-account-issuer=https://kubernetes.default.svc.cluster.local
         - --service-account-signing-key-file=/pki/sa/tls.key
-        {{- if .Values.konnectivityAgent.enabled }}{{"\n"}}
+        {{- if .Values.konnectivityAgent.enabled }}
         - --api-audiences=system:konnectivity-server
         {{- end }}
         {{- if not (hasKey .Values.apiServer.extraArgs "advertise-address") }}
@@ -147,13 +147,20 @@ spec:
           name: pki-apiserver-kubelet-client
         - mountPath: /pki/sa
           name: pki-sa
-        {{- if .Values.konnectivityServer.enabled }}{{"\n"}}
+        {{- if and .Values.konnectivityServer.enabled (eq .Values.konnectivityServer.mode "HTTPConnect") }}
         - mountPath: /pki/konnectivity-client
           name: pki-konnectivity-client
+        {{- end }}
+        {{- if and .Values.konnectivityServer.enabled (eq .Values.konnectivityServer.mode "GRPC") }}
+        - mountPath: /run/konnectivity-server
+          name: konnectivity-uds
         {{- end }}
         {{- with .Values.apiServer.extraVolumeMounts }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- if and .Values.konnectivityServer.enabled (eq .Values.konnectivityServer.mode "GRPC") }}
+      {{ template "kubernetes.konnectivityServer.containers" . }}
+      {{- end }}
       {{- with .Values.apiServer.sidecars }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
@@ -176,10 +183,13 @@ spec:
       - secret:
           secretName: "{{ $fullName }}-pki-sa"
         name: pki-sa
-      {{- if .Values.konnectivityServer.enabled }}{{"\n"}}
+      {{- if .Values.konnectivityServer.enabled }}
       - secret:
           secretName: "{{ $fullName }}-pki-konnectivity-client"
         name: pki-konnectivity-client
+      {{- end }}
+      {{- if and .Values.konnectivityServer.enabled (eq .Values.konnectivityServer.mode "GRPC") }}
+      {{ template "kubernetes.konnectivityServer.volumes" . }}
       {{- end }}
       {{- with .Values.apiServer.extraVolumes }}
       {{- toYaml . | nindent 6 }}
