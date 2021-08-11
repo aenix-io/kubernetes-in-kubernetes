@@ -114,6 +114,9 @@ spec:
       {{- with .Values.scheduler.sidecars }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
       - configMap:
           name: "{{ $fullName }}-scheduler-conf"

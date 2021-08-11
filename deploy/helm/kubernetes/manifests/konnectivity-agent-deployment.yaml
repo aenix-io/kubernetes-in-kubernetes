@@ -40,6 +40,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       hostNetwork: {{ .Values.konnectivityAgent.hostNetwork }}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       priorityClassName: system-cluster-critical
       tolerations:
       - key: "CriticalAddonsOnly"

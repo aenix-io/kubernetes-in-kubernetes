@@ -164,6 +164,9 @@ spec:
       {{- with .Values.apiServer.sidecars }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
       - configMap:
           name: "{{ $fullName }}-apiserver-config"

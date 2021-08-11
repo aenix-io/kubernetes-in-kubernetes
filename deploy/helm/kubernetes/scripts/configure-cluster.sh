@@ -21,8 +21,6 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 # upload configuration
 # TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/6
 kubeadm init phase upload-config kubeadm --config /config/kubeadmcfg.yaml
-kubectl patch configmap -n kube-system kubeadm-config \
-  -p '{"data":{"ClusterStatus":"apiEndpoints: {}\napiVersion: kubeadm.k8s.io/v1beta2\nkind: ClusterStatus"}}'
 
 # upload configuration
 # TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/5

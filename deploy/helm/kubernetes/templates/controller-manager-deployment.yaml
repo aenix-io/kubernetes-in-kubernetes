@@ -129,6 +129,9 @@ spec:
       {{- with .Values.controllerManager.sidecars }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
       - configMap:
           name: "{{ $fullName }}-controller-manager-conf"

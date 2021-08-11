@@ -127,6 +127,9 @@ spec:
           {{- with .Values.etcd.backup.sidecars }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
           volumes:
           - secret:
               secretName: {{ $fullName }}-pki-etcd-ca

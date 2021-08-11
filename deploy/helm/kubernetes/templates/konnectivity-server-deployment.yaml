@@ -72,5 +72,8 @@ spec:
       {{- with .Values.konnectivityServer.sidecars }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       {{ template "kubernetes.konnectivityServer.volumes" . }}
 {{- end }}
