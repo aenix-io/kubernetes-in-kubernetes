@@ -42,8 +42,6 @@ etcd:
     ipAddresses: []
 
   extraArgs: {}
-    # advertise-address is required for kube-proxy
-    #advertise-address: 10.9.8.10
   labels: {}
   annotations: {}
   podLabels: {}
@@ -125,6 +123,8 @@ apiServer:
   serviceClusterIPRange: 10.96.0.0/12
 
   extraArgs: {}
+    # advertise-address is required for kube-proxy
+    #advertise-address: 10.9.8.10
   labels: {}
   annotations: {}
   podLabels: {}
