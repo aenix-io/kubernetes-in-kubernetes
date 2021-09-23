@@ -87,6 +87,11 @@ spec:
         - --use-service-account-credentials=true
         - --tls-cert-file=/pki/controller-manager-server/tls.crt
         - --tls-private-key-file=/pki/controller-manager-server/tls.key
+        - --service-cluster-ip-range={{ .Values.networking.serviceSubnet }}
+        {{ with .Values.networking.podSubnet }}
+        --allocate-node-cidrs=true
+        - --cluster-cidr={{ . }}
+        {{- end }}
         {{- range $key, $value := .Values.controllerManager.extraArgs }}
         - --{{ $key }}={{ $value }}
         {{- end }}

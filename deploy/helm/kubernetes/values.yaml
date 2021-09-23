@@ -1,4 +1,8 @@
 controlPlaneEndpoint:
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+  podSubnet: #10.112.0.0/12
 
 persistence:
   enabled: true
@@ -119,8 +123,6 @@ apiServer:
   certSANs:
     dnsNames: []
     ipAddresses: []
-
-  serviceClusterIPRange: 10.96.0.0/12
 
   extraArgs: {}
     # advertise-address is required for kube-proxy

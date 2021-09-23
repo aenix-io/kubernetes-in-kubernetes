@@ -95,11 +95,11 @@ spec:
         - --requestheader-username-headers=X-Remote-User
         - --secure-port={{ .Values.apiServer.port }}
         - --service-account-key-file=/pki/sa/tls.crt
-        - --service-cluster-ip-range={{ .Values.apiServer.serviceClusterIPRange }}
+        - --service-cluster-ip-range={{ .Values.networking.serviceSubnet }}
         - --tls-cert-file=/pki/apiserver-server/tls.crt
         - --tls-private-key-file=/pki/apiserver-server/tls.key
         - --egress-selector-config-file=/etc/kubernetes/egress-selector-configuration.yaml
-        - --service-account-issuer=https://kubernetes.default.svc.cluster.local
+        - --service-account-issuer=https://kubernetes.default.svc.{{ .Values.networking.dnsDomain }}
         - --service-account-signing-key-file=/pki/sa/tls.key
         {{- if .Values.konnectivityAgent.enabled }}
         - --api-audiences=system:konnectivity-server
