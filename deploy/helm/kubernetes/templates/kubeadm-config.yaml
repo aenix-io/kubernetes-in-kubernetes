@@ -17,7 +17,9 @@ data:
     {{- with .Values.networking }}
     networking:
       dnsDomain: {{ .dnsDomain }}
-      podSubnet: {{ .podSubnet }}
+      {{- with .podSubnet }}
+      podSubnet: {{ . }}
+      {{- end }}
       serviceSubnet: {{ .serviceSubnet }}
     {{- end }}
 {{- end }}

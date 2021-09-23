@@ -108,7 +108,7 @@ apiServer:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-apiserver
-    tag: v1.22.0
+    tag: v1.22.2
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -157,7 +157,7 @@ controllerManager:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-controller-manager
-    tag: v1.22.0
+    tag: v1.22.2
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -197,7 +197,7 @@ scheduler:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-scheduler
-    tag: v1.22.0
+    tag: v1.22.2
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -237,7 +237,7 @@ admin:
   enabled: true
   image:
     repository: ghcr.io/kvaps/kubernetes-tools
-    tag: v0.13.0
+    tag: v0.13.1
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 1
