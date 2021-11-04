@@ -108,7 +108,7 @@ apiServer:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-apiserver
-    tag: v1.22.2
+    tag: v1.22.3
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -157,7 +157,7 @@ controllerManager:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-controller-manager
-    tag: v1.22.2
+    tag: v1.22.3
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -197,7 +197,7 @@ scheduler:
   enabled: true
   image:
     repository: k8s.gcr.io/kube-scheduler
-    tag: v1.22.2
+    tag: v1.22.3
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -237,7 +237,7 @@ admin:
   enabled: true
   image:
     repository: ghcr.io/kvaps/kubernetes-tools
-    tag: v0.13.1
+    tag: v0.13.2
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 1
@@ -276,7 +276,7 @@ coredns:
   enabled: true
   image:
     repository: coredns/coredns
-    tag: 1.8.4
+    tag: 1.8.6
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -296,7 +296,7 @@ konnectivityServer:
   mode: GRPC
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-server
-    tag: v0.0.22
+    tag: v0.0.24
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
@@ -347,7 +347,7 @@ konnectivityAgent:
   enabled: false
   image:
     repository: us.gcr.io/k8s-artifacts-prod/kas-network-proxy/proxy-agent
-    tag: v0.0.22
+    tag: v0.0.24
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 2
