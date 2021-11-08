@@ -101,9 +101,6 @@ spec:
         - --egress-selector-config-file=/etc/kubernetes/egress-selector-configuration.yaml
         - --service-account-issuer=https://kubernetes.default.svc.{{ .Values.networking.dnsDomain }}
         - --service-account-signing-key-file=/pki/sa/tls.key
-        {{- if .Values.konnectivityAgent.enabled }}
-        - --api-audiences=system:konnectivity-server
-        {{- end }}
         {{- if not (hasKey .Values.apiServer.extraArgs "advertise-address") }}
         {{- with .Values.apiServer.service.loadBalancerIP }}
         - --advertise-address={{ . }}
