@@ -6,7 +6,7 @@ Deploy Kubernetes in Kubernetes using Helm
 
 ## Requirements
 
-* Kubernetes v1.15+
+* Kubernetes v1.21+
 * Helm v3
 * cert-manager v1.0.0+
 
