@@ -15,11 +15,7 @@ metadata:
   namespace: kube-system
   name: konnectivity-agent
 spec:
-  {{- if eq .Values.konnectivityServer.mode "HTTPConnect" }}
   replicas: {{ .Values.konnectivityAgent.replicaCount }}
-  {{- else }}
-  replicas: {{ .Values.apiServer.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       k8s-app: konnectivity-agent
