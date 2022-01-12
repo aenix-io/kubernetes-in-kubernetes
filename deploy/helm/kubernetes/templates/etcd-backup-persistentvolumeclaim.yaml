@@ -4,7 +4,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: etcd-backup
+  name: etcd-backup-{{ $fullName }}-etcd
   labels:
     app: {{ $fullName }}-etcd
     {{- if .Values.persistence.backup.labels }}
