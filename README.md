@@ -26,7 +26,7 @@ Deploy Kubernetes in Kubernetes using Helm
 
 ```bash
 helm repo add kvaps https://kvaps.github.io/charts
-helm install foo kvaps/kubernetes --version 0.13.3 \
+helm install foo kvaps/kubernetes --version 0.13.4 \
   --namespace foo \
   --create-namespace \
   --set persistence.storageClassName=local-path
