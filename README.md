@@ -45,4 +45,4 @@ If you're looking for a real use case, check out the following projects that imp
 
 * **[Kubefarm]** - Automated Kubernetes deployment and the PXE-bootable servers farm
 
-[kubefarm]: https://github.com/kvaps/kubefarm
+[kubefarm]: https://github.com/kubefarm/kubefarm

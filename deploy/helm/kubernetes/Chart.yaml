@@ -8,10 +8,14 @@ keywords:
   - go
   - cncf
   - containers
-home: https://github.com/kvaps/kubernetes-in-kubernetes
+home: https://github.com/kubefarm/kubernetes-in-kubernetes
 sources:
-  - https://github.com/kvaps/kubernetes-in-kubernetes
+  - https://github.com/kubefarm/kubernetes-in-kubernetes
   - https://github.com/kubernetes/kubernetes
 maintainers:
   - name: kvaps
     email: kvapss@gmail.com
+  - name: krakazyabra
+    email: pronin.egor@gmail.com
+  - name: mrakopes
+    email: dave@mtfbwy.cz
