@@ -19,16 +19,16 @@ done
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # upload configuration
-# TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/6
+# TODO: https://github.com/kubefarm/kubernetes-in-kubernetes/issues/6
 kubeadm init phase upload-config kubeadm --config /config/kubeadmcfg.yaml
 
 # upload configuration
-# TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/5
+# TODO: https://github.com/kubefarm/kubernetes-in-kubernetes/issues/5
 kubeadm init phase upload-config kubelet --config /config/kubeadmcfg.yaml -v1 2>&1 |
   while read line; do echo "$line" | grep 'Preserving the CRISocket information for the control-plane node' && killall kubeadm || echo "$line"; done
 
 # setup bootstrap-tokens
-# TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/7
+# TODO: https://github.com/kubefarm/kubernetes-in-kubernetes/issues/7
 # TODO: https://github.com/kubernetes/kubernetes/issues/98881
 flatconfig=$(mktemp)
 kubectl config view --flatten > "$flatconfig"
@@ -81,7 +81,7 @@ kubectl delete -f /manifests/coredns.yaml 2>/dev/null || true
 
 {{- if .Values.kubeProxy.enabled }}{{"\n"}}
 # install kube-proxy addon
-# TODO: https://github.com/kvaps/kubernetes-in-kubernetes/issues/4
+# TODO: https://github.com/kubefarm/kubernetes-in-kubernetes/issues/4
 kubeadm init phase addon kube-proxy --config /config/kubeadmcfg.yaml
 {{- else }}{{"\n"}}
 # uninstall kube-proxy addon
