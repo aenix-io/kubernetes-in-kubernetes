@@ -1,7 +1,5 @@
 {{- $fullName := include "kubernetes.fullname" . -}}
-apiVersion: apps/v1
-kind: Deployment
-metadata:
+{{- define "konnectivity-agent.metadata" }}
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
     k8s-app: konnectivity-agent
@@ -14,12 +12,9 @@ metadata:
     {{- end }}
   namespace: kube-system
   name: konnectivity-agent
-spec:
-  replicas: {{ .Values.konnectivityAgent.replicaCount }}
-  selector:
-    matchLabels:
-      k8s-app: konnectivity-agent
-  template:
+{{- end -}}
+{{- define "konnectivity-agent.template" }}
+  {{- $fullName := include "kubernetes.fullname" . -}}
     metadata:
       labels:
         k8s-app: konnectivity-agent
@@ -143,3 +138,26 @@ spec:
       {{- with .Values.konnectivityAgent.extraVolumes }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
+{{- end -}}
+{{- if false -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- include "konnectivity-agent.metadata" . }}
+spec:
+  replicas: {{ .Values.konnectivityAgent.replicaCount }}
+  selector:
+    matchLabels:
+      k8s-app: konnectivity-agent
+{{- else -}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  {{- include "konnectivity-agent.metadata" . }}
+spec:
+  selector:
+    matchLabels:
+      k8s-app: konnectivity-agent
+{{- end }}
+  template:
+    {{ include "konnectivity-agent.template" . }}
