@@ -1,6 +1,6 @@
 name: kubernetes
 description: Production-Grade Container Scheduling and Management
-version: 0.13.3
+version: 0.13.4
 appVersion: 1.22.4
 icon: https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Kubernetes_logo_without_workmark.svg/723px-Kubernetes_logo_without_workmark.svg.png
 keywords:
@@ -8,10 +8,14 @@ keywords:
   - go
   - cncf
   - containers
-home: https://github.com/kvaps/kubernetes-in-kubernetes
+home: https://github.com/kubefarm/kubernetes-in-kubernetes
 sources:
-  - https://github.com/kvaps/kubernetes-in-kubernetes
+  - https://github.com/kubefarm/kubernetes-in-kubernetes
   - https://github.com/kubernetes/kubernetes
 maintainers:
   - name: kvaps
     email: kvapss@gmail.com
+  - name: krakazyabra
+    email: pronin.egor@gmail.com
+  - name: mrakopes
+    email: dave@mtfbwy.cz

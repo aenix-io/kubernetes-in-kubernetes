@@ -1,7 +1,7 @@
 {{- if .Values.admin.job.enabled }}
 {{- $fullName := include "kubernetes.fullname" . -}}
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: "{{ $fullName }}-kubeadm-tasks"

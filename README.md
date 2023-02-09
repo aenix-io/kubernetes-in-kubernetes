@@ -6,7 +6,7 @@ Deploy Kubernetes in Kubernetes using Helm
 
 ## Requirements
 
-* Kubernetes v1.15+
+* Kubernetes v1.21+
 * Helm v3
 * cert-manager v1.0.0+
 
@@ -26,7 +26,7 @@ Deploy Kubernetes in Kubernetes using Helm
 
 ```bash
 helm repo add kvaps https://kvaps.github.io/charts
-helm install foo kvaps/kubernetes --version 0.13.3 \
+helm install foo kvaps/kubernetes --version 0.13.4 \
   --namespace foo \
   --create-namespace \
   --set persistence.storageClassName=local-path
@@ -45,4 +45,4 @@ If you're looking for a real use case, check out the following projects that imp
 
 * **[Kubefarm]** - Automated Kubernetes deployment and the PXE-bootable servers farm
 
-[kubefarm]: https://github.com/kvaps/kubefarm
+[kubefarm]: https://github.com/kubefarm/kubefarm
