@@ -1,6 +1,12 @@
 {{- $fullName := include "kubernetes.fullname" . -}}
+
+{{- if .Values.konnectivityAgent.daemonSet -}}
+apiVersion: apps/v1
+kind: DaemonSet
+{{- else -}}
 apiVersion: apps/v1
 kind: Deployment
+{{- end }}
 metadata:
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
@@ -15,7 +21,9 @@ metadata:
   namespace: kube-system
   name: konnectivity-agent
 spec:
+  {{- if not .Values.konnectivityAgent.daemonSet }}
   replicas: {{ .Values.konnectivityAgent.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       k8s-app: konnectivity-agent

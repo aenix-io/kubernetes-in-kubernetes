@@ -350,6 +350,7 @@ konnectivityAgent:
     tag: v0.0.24
     pullPolicy: IfNotPresent
     pullSecrets: []
+  daemonSet: false
   replicaCount: 2
   hostNetwork: true
 
