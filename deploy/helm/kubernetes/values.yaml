@@ -237,7 +237,7 @@ admin:
   enabled: true
   image:
     repository: ghcr.io/kvaps/kubernetes-tools
-    tag: v0.13.4
+    tag: v0.13.5
     pullPolicy: IfNotPresent
     pullSecrets: []
   replicaCount: 1
@@ -350,6 +350,7 @@ konnectivityAgent:
     tag: v0.0.24
     pullPolicy: IfNotPresent
     pullSecrets: []
+  daemonSet: false
   replicaCount: 2
   hostNetwork: true
 
